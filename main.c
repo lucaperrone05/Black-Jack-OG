@@ -1,3 +1,5 @@
+// Avvio programma, menu principale
+
 #include <stdio.h>
 #include <stdlib.h>
 
