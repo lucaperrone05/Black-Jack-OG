@@ -3,18 +3,23 @@
 #include <string.h>
 #include "utils.h"
 #include "user.h"
+#include "db.h"
 
 int main() {
-    printCentered("Gioca a BlackJack!\n\n");
+    
+	printCentered("Gioca a BlackJack!\n\n");
 
     printf("Selezionare un'opzione:\n");
-    printCentered("1. Login\n");
+    
+	printCentered("1. Login\n");
     printCentered("2. Sign Up\n");
     printCentered("3. Exit\n");
 
     int menu;
-    printf("\nScelta: ");
-    scanf("%d", &menu);
+    
+	printf("\nScelta: ");
+    
+	scanf("%d", &menu);
     getchar(); // ?? Svuota il buffer per evitare problemi con fgets()
 
 	char nome [20];
@@ -37,9 +42,11 @@ int main() {
             return 0;
 	
         default:
-            printf("\nOpzione non valida! Riprova.\n");
-            break;
+            printf("\nOpzione non valida!\n");
+            return 0;
     }
+    
+    
 
     return 0;
 }
