@@ -24,12 +24,12 @@ HostApplication=
 UseCustomMakefile=0
 CustomMakefile=
 CommandLine=
-Folders=db,deck,game,user,utils
+Folders=db,deck,game,sqlite,user,utils
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=1
 CompilerSettings=0000000000000000001000000
-UnitCount=14
+UnitCount=15
 
 [VersionInfo]
 Major=1
@@ -161,19 +161,18 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit12]
-FileName=sqlite3.c
-CompileCpp=0
-Folder=
-Compile=1
-Link=1
+FileName=blackjack.db
+Folder=sqlite
+Compile=0
+Link=0
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
 [Unit13]
-FileName=sqlite3.h
+FileName=sqlite3.c
 CompileCpp=0
-Folder=
+Folder=sqlite
 Compile=1
 Link=1
 Priority=1000
@@ -181,9 +180,19 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit14]
+FileName=sqlite3.h
+CompileCpp=0
+Folder=sqlite
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit15]
 FileName=sqlite3ext.h
 CompileCpp=0
-Folder=
+Folder=sqlite
 Compile=1
 Link=1
 Priority=1000
