@@ -25,49 +25,17 @@ int main() {
 			
     switch(menu) {
         case 1:
-            system("cls");
-            printCentered("Login\n\n");
-            
-			printf("Username: ");
-            fgets(username, sizeof(username), stdin);
-            username[strcspn(username, "\n")] = 0;
-			
-			printf("Password: ");
-            fgets(password, sizeof(password), stdin);
-            password[strcspn(password, "\n")] = 0;
-
+            login();
             break;
 
         case 2:
-            system("cls");
-            printCentered("Sign Up\n\n");
-            
-            printf("Nome: ");
-            fgets(nome, sizeof(nome), stdin);
-            nome[strcspn(nome, "\n")] = 0;
-            
-            printf("Cognome: ");
-            fgets(cognome, sizeof(cognome), stdin);
-            cognome[strcspn(cognome, "\n")] = 0;
-            
-			printf("Username: ");
-            fgets(username, sizeof(username), stdin);
-            username[strcspn(username, "\n")] = 0;
-			
-			printf("Password: ");
-            fgets(password, sizeof(password), stdin);
-            password[strcspn(password, "\n")] = 0;
-
-			printf("Ripetere la password: ");
-            fgets(ripeti_password, sizeof(ripeti_password), stdin);
-            ripeti_password[strcspn(ripeti_password, "\n")] = 0;
-            
+            signUp();
             break;
 
         case 3:
             printf("\nChiusura del programma...\n");
             return 0;
-
+	
         default:
             printf("\nOpzione non valida! Riprova.\n");
             break;
@@ -75,4 +43,3 @@ int main() {
 
     return 0;
 }
-

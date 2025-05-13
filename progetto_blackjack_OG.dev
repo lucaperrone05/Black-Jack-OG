@@ -29,7 +29,11 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=1
 CompilerSettings=0000000000000000001000000
+<<<<<<< HEAD
 UnitCount=15
+=======
+UnitCount=15
+>>>>>>> f564331bf9db913c03f8d62bc9b9339241192420
 
 [VersionInfo]
 Major=1
@@ -161,25 +165,16 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit12]
-FileName=blackjack.db
-Folder=sqlite
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit13]
 FileName=sqlite3.c
-CompileCpp=0
 Folder=sqlite
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
+CompileCpp=0
 
-[Unit14]
+[Unit13]
 FileName=sqlite3.h
 CompileCpp=0
 Folder=sqlite
@@ -189,12 +184,22 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit15]
+[Unit14]
 FileName=sqlite3ext.h
 CompileCpp=0
 Folder=sqlite
 Compile=1
 Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit15]
+FileName=blackjack.db
+CompileCpp=0
+Folder=sqlite
+Compile=0
+Link=0
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
