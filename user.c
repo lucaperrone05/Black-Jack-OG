@@ -35,25 +35,29 @@ void getPassword(char* password, int maxLength) {
 
 // Funzione Login
 void login() {
+    
     sqlite3* db;
     apriDatabase(&db);
+    int temp;
 
-    system("cls");
-    printCentered("Login\n\n");
+    do{
+        system("cls");
+        printCentered("Login\n\n");
 
-    char username[20], password[20];
+        char username[20], password[20];
 
-    printf("Username: ");
-    fgets(username, sizeof(username), stdin);
-    username[strcspn(username, "\n")] = 0;
+        printf("Username: ");
+        fgets(username, sizeof(username), stdin);
+        username[strcspn(username, "\n")] = 0;
 
-    printf("Password: ");
-    getPassword(password, sizeof(password));
+        printf("Password: ");
+        getPassword(password, sizeof(password));
+        
+        temp = loginDb(db, username, password); 
 
-    loginDb(db, username, password); // Funzione per il login nel database
-
+    } while (temp == 0);
     
-
+	sqlite3_close(db);
 
 }
 
@@ -88,29 +92,19 @@ void signUp() {
     getPassword(ripeti_password, sizeof(ripeti_password));
 
     if (strcmp(password, ripeti_password) != 0) {
-
-        printf("\nErrore: le password non corrispondono, riprova.\n");
-        Sleep(2000); // Attesa di 2 secondi
+        printf("\nErrore: le password non corrispondono.\n");
+        Sleep(2000);
     }
     else if (strlen(password) < 8) {
-
         printf("\nErrore: la password deve essere lunga almeno 8 caratteri.\n");
-
+        Sleep(3000);
     }
     else {
+        registraUtente(db, nome, cognome, username, password);
+        Sleep(3000);
 
-        if (signUpDb(db, nome, cognome, username, password) == 1) {
-
-            printf("\nRegistrazione avvenuta con successo!\n");
-            Sleep(2000); // Attesa di 2 secondi
-
-        }
-        else {
-
-            printf("\nErrore: username già esistente.\n");
-            Sleep(2000); // Attesa di 2 secondi
-
-        }
+		login(); // Reindirizza alla funzione di login dopo la registrazione
     }
 
+    sqlite3_close(db);
 }

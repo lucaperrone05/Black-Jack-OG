@@ -3,21 +3,17 @@
 #include "sqlite3.h"
 
 //funzione che apre il database
-void apriDatabase(sqlite3* db) {
-
-
-	int rc = sqlite3_open("blackjack.db", &db); // Apre il database (crea il file se non esiste)
-
+void apriDatabase(sqlite3** db) {
+	int rc = sqlite3_open("blackjack.db", db); // Corretto: passa il doppio puntatore
 	if (rc != SQLITE_OK) {
-		printf("Database non aperto correttamente: %s\n", sqlite3_errmsg(db));
-		sqlite3_close(db);
+		printf("Database non aperto correttamente: %s\n", sqlite3_errmsg(*db));
+		sqlite3_close(*db);
 	}
-
 }
 
 
 //funzione per creare la tabella utenti se non esiste
-void creaTabellaUser(db) {
+void creaTabellaUser(sqlite3* db) {
 	char* sqlCreate = "CREATE TABLE IF NOT EXISTS utenti ("
 		"id INTEGER PRIMARY KEY AUTOINCREMENT, "
 		"nome TEXT NOT NULL, "
@@ -38,69 +34,69 @@ void creaTabellaUser(db) {
 }
 
 //funzione per inserire il nuovo utente nel database
-void registraUtente(sqlite3* db, char nome, char cognome, char username, char password) {
-	sqlite3_stmt* stmt; // Dichiarazione del puntatore per la query
+// Cambia i tipi da 'char' a 'char*'
+void registraUtente(sqlite3* db, char* nome, char* cognome, char* username, char* password) {
+	sqlite3_stmt* stmt;
 
-	// Query SQL per inserire i dati dell'utente
-	char sqlInsert = "INSERT INTO utenti(nome, cognome, username, saldo, password) VALUES (?, ?, ?, ?, ?);";
-	int rc = sqlite3_prepare_v2(db, sqlInsert, -1, &stmt, 0); // Prepara la query SQL
+	const char* sqlInsert = "INSERT INTO utenti(nome, cognome, username, saldo, password) VALUES (?, ?, ?, ?, ?);";
+	int rc = sqlite3_prepare_v2(db, sqlInsert, -1, &stmt, 0);
 
 	if (rc != SQLITE_OK) {
 		printf("Errore preparazione query: %s\n", sqlite3_errmsg(db));
-		sqlite3_close(db);
-
+		return;
 	}
 
-	sqlite3_bind_text(stmt, 1, nome, -1, SQLITE_STATIC); // Associa il parametro nome
-	sqlite3_bind_text(stmt, 2, cognome, -1, SQLITE_STATIC); // Associa il parametro cognome
-	sqlite3_bind_text(stmt, 3, username, -1, SQLITE_STATIC); // Associa il parametro username
-	sqlite3_bind_int(stmt, 4, 4000); // Associa il parametro saldo 
-	sqlite3_bind_text(stmt, 5, password, -1, SQLITE_STATIC); // Associa il parametro password
+	sqlite3_bind_text(stmt, 1, nome, -1, SQLITE_STATIC);
+	sqlite3_bind_text(stmt, 2, cognome, -1, SQLITE_STATIC);
+	sqlite3_bind_text(stmt, 3, username, -1, SQLITE_STATIC);
+	sqlite3_bind_int(stmt, 4, 4000); // saldo iniziale
+	sqlite3_bind_text(stmt, 5, password, -1, SQLITE_STATIC);
 
+	rc = sqlite3_step(stmt);
 
-	rc = sqlite3_step(stmt); // Esegue la query
-
-	if (rc != SQLITE_OK) {
-
+	if (rc != SQLITE_DONE) {
 		printf("Errore inserimento: %s\n", sqlite3_errmsg(db));
-
 	}
 	else {
-
 		printf("Dati inseriti con successo.\n");
-
 	}
 
-	sqlite3_close(db); // Chiude il database
+	sqlite3_finalize(stmt);
 }
+
 
 
 //funzione per cercare l'utente nel database
-void loginDb(sqlite3* db, const char* username, const char* password) {
-	sqlite3_stmt* stmt; // Dichiarazione del puntatore per la query
+int loginDb(sqlite3* db, const char* username, const char* password) {
+	sqlite3_stmt* stmt;
+	int loginValido = 0;
 
 	const char* sql = "SELECT COUNT(*) FROM utenti WHERE username = ? AND password = ?;";
-	int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL); // Prepara la query SQL
+	int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
 	if (rc != SQLITE_OK) {
 		printf("Errore nella preparazione della query: %s\n", sqlite3_errmsg(db));
-
+		return 0;
 	}
 
-	sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC); // Associa il parametro username
-	sqlite3_bind_text(stmt, 2, password, -1, SQLITE_STATIC); // Associa il parametro password
-	sqlite3_step(stmt); // Esegue la query
-	sqlite3_finalize(stmt); // Libera la memoria allocata per la query
+	sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
+	sqlite3_bind_text(stmt, 2, password, -1, SQLITE_STATIC);
+
+	rc = sqlite3_step(stmt);
+	if (rc == SQLITE_ROW) {
+		int count = sqlite3_column_int(stmt, 0); // Legge il valore di COUNT(*)
+		if (count == 1) {
+			loginValido = 1; // Login riuscito
+		}
+		else {
+			printf("Credenziali errate.\n");
+			Sleep(2000);
+		}
+	}
+	else {
+		printf("Errore durante l'esecuzione della query.\n");
+		Sleep(2000);
+	}
+
+	sqlite3_finalize(stmt);
+	return loginValido;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

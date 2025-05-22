@@ -100,7 +100,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
@@ -127,6 +127,7 @@
     <ClCompile Include="db.c" />
     <ClCompile Include="deck.c" />
     <ClCompile Include="game.c" />
+    <ClCompile Include="main.c" />
     <ClCompile Include="sqlite3.c" />
     <ClCompile Include="user.c" />
     <ClCompile Include="utils.c" />

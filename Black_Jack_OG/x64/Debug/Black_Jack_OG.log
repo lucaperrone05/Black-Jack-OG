@@ -1,10 +1,3 @@
-﻿  game.c
-C:\Users\onny\Desktop\Black_Jack_OG\game.c(74,9): error C4996: 'scanf': This function or variable may be unsafe. Consider using scanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  user.c
-C:\Users\onny\Desktop\Black_Jack_OG\user.c(39,18): warning C4047: 'funzione': 'sqlite3 *' differisce da 'sqlite3 **' nei livelli di riferimento indiretto
-C:\Users\onny\Desktop\Black_Jack_OG\user.c(39,18): warning C4024: 'apriDatabase': tipi diversi tra il parametro 1 formale e quello effettivo
-C:\Users\onny\Desktop\Black_Jack_OG\user.c(42,5): warning C4013: 'printCentered' non definita. Verrà considerata come esterna che restituisce un int.
-C:\Users\onny\Desktop\Black_Jack_OG\user.c(65,18): warning C4047: 'funzione': 'sqlite3 *' differisce da 'sqlite3 **' nei livelli di riferimento indiretto
-C:\Users\onny\Desktop\Black_Jack_OG\user.c(65,18): warning C4024: 'apriDatabase': tipi diversi tra il parametro 1 formale e quello effettivo
-C:\Users\onny\Desktop\Black_Jack_OG\user.c(102,13): warning C4013: 'signUpDb' non definita. Verrà considerata come esterna che restituisce un int.
-  Generazione del codice in corso...
+﻿  db.c
+C:\Users\perro\OneDrive\Desktop\Black Jack OG  vs\Black-Jack-OG\db.c(92,4): warning C4013: 'Sleep' non definita. Verrà considerata come esterna che restituisce un int.
+  Black_Jack_OG.vcxproj -> C:\Users\perro\OneDrive\Desktop\Black Jack OG  vs\Black-Jack-OG\x64\Debug\Black_Jack_OG.exe
