@@ -1,6 +1,7 @@
 // Interfaccia con SQLite
 #include <stdio.h>
 #include "sqlite3.h"
+#include "user.h"
 
 //funzione che apre il database
 void apriDatabase(sqlite3** db) {
@@ -99,4 +100,34 @@ int loginDb(sqlite3* db, const char* username, const char* password) {
 
 	sqlite3_finalize(stmt);
 	return loginValido;
+}
+
+
+int caricaUtente(sqlite3* db, const char* username, Utente* utente) {
+	sqlite3_stmt* stmt;
+	const char* sql = "SELECT id, nome, cognome, username, saldo FROM utenti WHERE username = ?;";
+
+	int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+	if (rc != SQLITE_OK) {
+		printf("Errore preparazione query: %s\n", sqlite3_errmsg(db));
+		return 0;
+	}
+
+	sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
+
+	rc = sqlite3_step(stmt);
+	if (rc == SQLITE_ROW) {
+		utente->id = sqlite3_column_int(stmt, 0); // ID
+		strcpy(utente->nome, (const char*)sqlite3_column_text(stmt, 1)); // nome
+		strcpy(utente->cognome, (const char*)sqlite3_column_text(stmt, 2)); // cognome
+		strcpy(utente->username, (const char*)sqlite3_column_text(stmt, 3)); // username
+		utente->saldo = sqlite3_column_int(stmt, 4); // saldo
+		sqlite3_finalize(stmt);
+		return 1;
+	}
+	else {
+		printf("Utente non trovato.\n");
+		sqlite3_finalize(stmt);
+		return 0;
+	}
 }

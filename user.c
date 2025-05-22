@@ -2,6 +2,7 @@
 #include <conio.h> // Per _getch()
 #include <stdio.h>
 #include <string.h>
+#include "user.h"
 #include "db.h"
 
 
@@ -34,17 +35,18 @@ void getPassword(char* password, int maxLength) {
 
 
 // Funzione Login
-void login() {
-    
+void login(Utente* utente) {
+
     sqlite3* db;
-    apriDatabase(&db);
+
     int temp;
+    char username[20], password[20];
+
+    apriDatabase(&db);
 
     do{
         system("cls");
         printCentered("Login\n\n");
-
-        char username[20], password[20];
 
         printf("Username: ");
         fgets(username, sizeof(username), stdin);
@@ -56,6 +58,8 @@ void login() {
         temp = loginDb(db, username, password); 
 
     } while (temp == 0);
+
+    caricaUtente(db, username, utente);
     
 	sqlite3_close(db);
 
@@ -63,48 +67,60 @@ void login() {
 
 
 // Funzione Sign Up
-void signUp() {
+void signUp(Utente* utente) {
     char nome[20], cognome[20], username[20], password[20], ripeti_password[20];
+	int flag = 0;
+    
     sqlite3* db;
     apriDatabase(&db);
 
+
+    do{
+        system("cls");
+        printCentered("Sign Up\n\n");
+
+        creaTabellaUser(db); // Crea la tabella se non esiste
+
+        printf("Nome: ");
+        fgets(nome, sizeof(nome), stdin);
+        nome[strcspn(nome, "\n")] = 0;
+
+        printf("Cognome: ");
+        fgets(cognome, sizeof(cognome), stdin);
+        cognome[strcspn(cognome, "\n")] = 0;
+
+        printf("Username: ");
+        fgets(username, sizeof(username), stdin);
+        username[strcspn(username, "\n")] = 0;
+
+        printf("Password: ");
+        getPassword(password, sizeof(password));
+
+        printf("Ripetere la password: ");
+        getPassword(ripeti_password, sizeof(ripeti_password));
+
+        if (strcmp(password, ripeti_password) != 0) {
+            printf("\nErrore: le password non corrispondono.\n");
+			flag = 1;
+            Sleep(2000);
+        }
+        else if (strlen(password) < 6) {
+            printf("\nErrore: la password deve essere lunga almeno 6 caratteri.\n");
+			flag = 1;
+            Sleep(2500);
+        }
+
+    }while (flag == 1);
+        
+    
+    registraUtente(db, nome, cognome, username, password);
+		
     system("cls");
-    printCentered("Sign Up\n\n");
+	printf("\n\n\n");
+    printCentered("Registrazione completata con successo!\n\n");
+    printCentered("4000 gettoni bonus per te!");
+    Sleep(2500);
 
-    creaTabellaUser(db); // Crea la tabella se non esiste
+    login(utente); // Reindirizza alla funzione di login dopo la registrazione
 
-    printf("Nome: ");
-    fgets(nome, sizeof(nome), stdin);
-    nome[strcspn(nome, "\n")] = 0;
-
-    printf("Cognome: ");
-    fgets(cognome, sizeof(cognome), stdin);
-    cognome[strcspn(cognome, "\n")] = 0;
-
-    printf("Username: ");
-    fgets(username, sizeof(username), stdin);
-    username[strcspn(username, "\n")] = 0;
-
-    printf("Password: ");
-    getPassword(password, sizeof(password));
-
-    printf("Ripetere la password: ");
-    getPassword(ripeti_password, sizeof(ripeti_password));
-
-    if (strcmp(password, ripeti_password) != 0) {
-        printf("\nErrore: le password non corrispondono.\n");
-        Sleep(2000);
-    }
-    else if (strlen(password) < 8) {
-        printf("\nErrore: la password deve essere lunga almeno 8 caratteri.\n");
-        Sleep(3000);
-    }
-    else {
-        registraUtente(db, nome, cognome, username, password);
-        Sleep(3000);
-
-		login(); // Reindirizza alla funzione di login dopo la registrazione
-    }
-
-    sqlite3_close(db);
 }

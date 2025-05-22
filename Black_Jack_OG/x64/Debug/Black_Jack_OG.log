@@ -1,3 +1,1 @@
-﻿  db.c
-C:\Users\perro\OneDrive\Desktop\Black Jack OG  vs\Black-Jack-OG\db.c(92,4): warning C4013: 'Sleep' non definita. Verrà considerata come esterna che restituisce un int.
-  Black_Jack_OG.vcxproj -> C:\Users\perro\OneDrive\Desktop\Black Jack OG  vs\Black-Jack-OG\x64\Debug\Black_Jack_OG.exe
+﻿  Black_Jack_OG.vcxproj -> C:\Users\perro\OneDrive\Desktop\Black Jack OG  vs\Black-Jack-OG\x64\Debug\Black_Jack_OG.exe

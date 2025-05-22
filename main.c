@@ -17,25 +17,21 @@ int main() {
     printCentered("3. Exit\n");
 
     int menu;
+    Utente utente = { 0 };
 
     printf("\nScelta: ");
 
     scanf("%d", &menu);
     getchar(); // ?? Svuota il buffer per evitare problemi con fgets()
 
-    char nome[20];
-    char cognome[20];
-    char username[20];
-    char password[20];
-    char ripeti_password[20];
-
     switch (menu) {
     case 1:
-        login();
+        login(&utente);
+        
         break;
 
     case 2:
-        signUp();
+        signUp(&utente);
         break;
 
     case 3:
@@ -47,6 +43,13 @@ int main() {
         return 0;
     }
 
+ 
+    printf("----- DATI UTENTE -----\n");
+    printf("ID: %d\n", utente.id);
+    printf("Nome: %s\n", utente.nome);
+    printf("Cognome: %s\n", utente.cognome);
+    printf("Username: %s\n", utente.username);
+    printf("Saldo: %d\n", utente.saldo);
 
 
     return 0;
