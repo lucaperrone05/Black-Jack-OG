@@ -1,1 +1,3 @@
-﻿  Black_Jack_OG.vcxproj -> C:\Users\perro\OneDrive\Desktop\Black Jack OG  vs\Black-Jack-OG\x64\Debug\Black_Jack_OG.exe
+﻿  user.c
+C:\Users\perro\OneDrive\Desktop\Black Jack OG  vs\Black-Jack-OG\user.c(67,9): warning C4013: 'printCentered' non definita. Verrà considerata come esterna che restituisce un int.
+  Black_Jack_OG.vcxproj -> C:\Users\perro\OneDrive\Desktop\Black Jack OG  vs\Black-Jack-OG\x64\Debug\Black_Jack_OG.exe

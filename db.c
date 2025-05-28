@@ -131,3 +131,21 @@ int caricaUtente(sqlite3* db, const char* username, Utente* utente) {
 		return 0;
 	}
 }
+
+int utenteEsiste(sqlite3* db, const char* username) {
+	sqlite3_stmt* stmt;
+	const char* sql = "SELECT COUNT(*) FROM utenti WHERE username = ?;";
+	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+		printf("Errore query: %s\n", sqlite3_errmsg(db));
+		return 1;                   // meglio bloccare la registrazione
+	}
+
+	sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
+
+	int exists = 0;
+	if (sqlite3_step(stmt) == SQLITE_ROW) {
+		exists = sqlite3_column_int(stmt, 0);   // 0 -> non esiste, >0 -> esiste
+	}
+	sqlite3_finalize(stmt);
+	return exists;   // 1 se già presente, 0 altrimenti
+}

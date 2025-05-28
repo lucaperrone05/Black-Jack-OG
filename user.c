@@ -7,31 +7,49 @@
 
 
 // Funzione per nascondere password con pallini
+#include <stdio.h>
+#include <windows.h>
+#include <conio.h>
+
 void getPassword(char* password, int maxLength) {
     HANDLE hConsole = GetStdHandle(STD_INPUT_HANDLE);
     DWORD mode;
     char ch;
     int i = 0;
 
-    // Disabilita l'echo dei caratteri
+    // Disabilita l'echo dei caratteri e l'input in buffer
     GetConsoleMode(hConsole, &mode);
     SetConsoleMode(hConsole, mode & ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT));
 
     while (i < maxLength - 1) {
-        ch = _getch(); // Legge un carattere senza mostrarlo
+        ch = _getch();
 
-        if (ch == '\r') break; // Termina con "Invio"
-
-        password[i++] = ch;
-        printf("*"); // Mostra pallino invece del carattere
+        if (ch == '\r') {
+            // Tasto Invio: esce dal ciclo senza usare break
+            i = maxLength - 1; // forza l'uscita al prossimo giro
+        }
+        else if (ch == 8) {
+            // Tasto backspace
+            if (i > 0) {
+                i--;
+                // Cancella l'asterisco dalla console
+                printf("\b \b");
+            }
+        }
+        else {
+            password[i] = ch;
+            i++;
+            printf("*");
+        }
     }
 
-    password[i] = '\0'; // Chiude la stringa
+    password[i == maxLength - 1 ? i : i] = '\0';
 
     // Riabilita l'echo dei caratteri
     SetConsoleMode(hConsole, mode);
     printf("\n");
 }
+
 
 
 // Funzione Login
@@ -69,58 +87,70 @@ void login(Utente* utente) {
 // Funzione Sign Up
 void signUp(Utente* utente) {
     char nome[20], cognome[20], username[20], password[20], ripeti_password[20];
-	int flag = 0;
-    
     sqlite3* db;
     apriDatabase(&db);
 
+    creaTabellaUser(db);                   // fuori dal ciclo va bene
 
-    do{
-        system("cls");
-        printCentered("Sign Up\n\n");
+    int ok, inputValido;                   // 0 se errori, 1 se tutto valido
+    do {
+        ok = 1;                            // presupponiamo sia tutto valido
+       
+        do {
+			inputValido = 1;               // resetta il flag di input valido
+            system("cls");
+            printCentered("Sign Up\n\n");
+            printf("Nome: ");
+            fgets(nome, sizeof(nome), stdin);
+            nome[strcspn(nome, "\n")] = 0;
 
-        creaTabellaUser(db); // Crea la tabella se non esiste
+            printf("Cognome: ");
+            fgets(cognome, sizeof(cognome), stdin);
+            cognome[strcspn(cognome, "\n")] = 0;
 
-        printf("Nome: ");
-        fgets(nome, sizeof(nome), stdin);
-        nome[strcspn(nome, "\n")] = 0;
+            printf("Username: ");
+            fgets(username, sizeof(username), stdin);
+            username[strcspn(username, "\n")] = 0;
 
-        printf("Cognome: ");
-        fgets(cognome, sizeof(cognome), stdin);
-        cognome[strcspn(cognome, "\n")] = 0;
+            if (strlen(nome) <= 2 || strlen(cognome) <= 1 || strlen(username) <= 2 || strchr(nome, ' ') || strchr(username, ' ')){
+                printf("\nErrore: dati non corretti\n");
+                Sleep(2000);
+                inputValido = 0; // qualcosa non va
+            }
 
-        printf("Username: ");
-        fgets(username, sizeof(username), stdin);
-        username[strcspn(username, "\n")] = 0;
+		} while (inputValido==0);
 
-        printf("Password: ");
-        getPassword(password, sizeof(password));
-
-        printf("Ripetere la password: ");
-        getPassword(ripeti_password, sizeof(ripeti_password));
-
-        if (strcmp(password, ripeti_password) != 0) {
-            printf("\nErrore: le password non corrispondono.\n");
-			flag = 1;
+        if (utenteEsiste(db, username)) {
+            printf("\nErrore: username gia' utilizzato.\n");
             Sleep(2000);
-        }
-        else if (strlen(password) < 6) {
-            printf("\nErrore: la password deve essere lunga almeno 6 caratteri.\n");
-			flag = 1;
-            Sleep(2500);
+            ok = 0;
         }
 
-    }while (flag == 1);
-        
-    
+        if (ok) {                         // chiedi la password solo se l'username è libero
+            printf("Password: ");
+            getPassword(password, sizeof(password));
+
+            printf("Ripetere la password: ");
+            getPassword(ripeti_password, sizeof(ripeti_password));
+
+            if (strcmp(password, ripeti_password) != 0) {
+                printf("\nErrore: le password non corrispondono.\n");
+                Sleep(2000);
+                ok = 0;
+            }
+            else if (strlen(password) < 6) {
+                printf("\nErrore: la password deve avere almeno 6 caratteri.\n");
+                Sleep(2500);
+                ok = 0;
+            }
+        }
+
+    } while (!ok);                        // ripeti finché qualcosa non va
+
+    /* Arrivi qui solo se tutto è valido */
     registraUtente(db, nome, cognome, username, password);
-		
-    system("cls");
-	printf("\n\n\n");
-    printCentered("Registrazione completata con successo!\n\n");
-    printCentered("4000 gettoni bonus per te!");
-    Sleep(2500);
+    Sleep(2000);
+    login(utente);                        // login immediato
 
-    login(utente); // Reindirizza alla funzione di login dopo la registrazione
-
+    sqlite3_close(db);
 }

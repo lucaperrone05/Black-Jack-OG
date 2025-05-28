@@ -8,49 +8,48 @@
 
 int main() {
 
-    printCentered("Gioca a BlackJack!\n\n");
+    int exit;
 
-    printf("Selezionare un'opzione:\n");
+    do {
+        exit = 0;
+        printCentered("Gioca a BlackJack!\n\n");
 
-    printCentered("1. Login\n");
-    printCentered("2. Sign Up\n");
-    printCentered("3. Exit\n");
+        printf("Selezionare un'opzione:\n");
 
-    int menu;
-    Utente utente = { 0 };
+        printCentered("1. Login\n");
+        printCentered("2. Sign Up\n");
+        printCentered("3. Exit\n");
 
-    printf("\nScelta: ");
+        int menu;
+        Utente utente = { 0 };
 
-    scanf("%d", &menu);
-    getchar(); // ?? Svuota il buffer per evitare problemi con fgets()
+        printf("\nScelta: ");
 
-    switch (menu) {
-    case 1:
-        login(&utente);
-        
-        break;
+        scanf("%d", &menu);
+        getchar(); // ?? Svuota il buffer per evitare problemi con fgets()
 
-    case 2:
-        signUp(&utente);
-        break;
 
-    case 3:
-        printf("\nChiusura del programma...\n");
-        return 0;
+        switch (menu) {
+        case 1:
+            login(&utente);
 
-    default:
-        printf("\nOpzione non valida!\n");
-        return 0;
-    }
+            break;
 
- 
-    printf("----- DATI UTENTE -----\n");
-    printf("ID: %d\n", utente.id);
-    printf("Nome: %s\n", utente.nome);
-    printf("Cognome: %s\n", utente.cognome);
-    printf("Username: %s\n", utente.username);
-    printf("Saldo: %d\n", utente.saldo);
+        case 2:
+            signUp(&utente);
+            break;
 
+        case 3:
+            printf("\nChiusura del programma...\n");
+            exit = 1;
+            break;
+
+        default:
+            printf("\nOpzione non valida!\n");
+            Sleep(1500);
+            system("cls"); // Pulisce lo schermo
+        }
+    } while (exit==0);
 
     return 0;
 }
