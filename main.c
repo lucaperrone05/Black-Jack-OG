@@ -8,7 +8,10 @@
 
 int main() {
 
-    int exit;
+    int exit, menu;
+
+    Utente utente = { 0 };
+
 
     do {
         exit = 0;
@@ -20,19 +23,14 @@ int main() {
         printCentered("2. Sign Up\n");
         printCentered("3. Exit\n");
 
-        int menu;
-        Utente utente = { 0 };
-
         printf("\nScelta: ");
 
         scanf("%d", &menu);
         getchar(); // ?? Svuota il buffer per evitare problemi con fgets()
 
-
         switch (menu) {
         case 1:
             login(&utente);
-
             break;
 
         case 2:
@@ -40,7 +38,10 @@ int main() {
             break;
 
         case 3:
-            printf("\nChiusura del programma...\n");
+            system("cls");
+			printf("\n\n\n");
+            printCentered("Chiusura del programma...");
+            printf("\n\n\n");
             exit = 1;
             break;
 
@@ -49,7 +50,7 @@ int main() {
             Sleep(1500);
             system("cls"); // Pulisce lo schermo
         }
-    } while (exit==0);
+    } while (exit==0 && utente.loggato==0);
 
     return 0;
 }

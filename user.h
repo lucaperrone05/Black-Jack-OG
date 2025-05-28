@@ -6,12 +6,13 @@ typedef struct {
 	char cognome[20];
 	char username[20];
 	int saldo;
+	int loggato; // 1 se loggato, 0 altrimenti
 } Utente;
 
 void registraUtente();
 
 void getPassword(char* password, int maxLength);
 
-void login(Utente* utente);
+int login(Utente* utente);
 
 void signUp(Utente* utente);

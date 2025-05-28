@@ -53,7 +53,7 @@ void getPassword(char* password, int maxLength) {
 
 
 // Funzione Login
-void login(Utente* utente) {
+int login(Utente* utente) {
 
     sqlite3* db;
 
@@ -78,9 +78,11 @@ void login(Utente* utente) {
     } while (temp == 0);
 
     caricaUtente(db, username, utente);
-    
+	utente->loggato = 1; // Imposta lo stato di login dell'utente
+
 	sqlite3_close(db);
 
+	return temp; // 1 se login riuscito, 0 altrimenti
 }
 
 
