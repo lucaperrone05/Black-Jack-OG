@@ -6,12 +6,14 @@
 #include "user.h"
 #include "db.h"
 
+
 int main() {
 
-    int exit, menu;
+    int exit, menu = 0;
 
     Utente utente = { 0 };
 
+    
 
     do {
         exit = 0;
@@ -23,10 +25,7 @@ int main() {
         printCentered("2. Sign Up\n");
         printCentered("3. Exit\n");
 
-        printf("\nScelta: ");
-
-        scanf("%d", &menu);
-        getchar(); // ?? Svuota il buffer per evitare problemi con fgets()
+        getScelta(&menu);
 
         switch (menu) {
         case 1:
@@ -51,6 +50,30 @@ int main() {
             system("cls"); // Pulisce lo schermo
         }
     } while (exit==0 && utente.loggato==0);
+
+
+	exit = 0; // reset exit per il gioco
+	menu = 0; // reset menu per il gioco
+
+    if (utente.loggato) {
+
+        do {
+            system("cls");
+            printCentered("Benvenuto nel gioco di BlackJack!\n\n");
+            printf("Nome utente: %s\n", utente.username);
+            printf("Saldo: %d\n", utente.saldo);
+            printf("\n\n");
+
+            getScelta(&menu);
+
+
+            switch (menu) {
+
+            }
+        }while(exit == 0);
+        
+
+    }
 
     return 0;
 }

@@ -50,16 +50,13 @@ void registraUtente(sqlite3* db, char* nome, char* cognome, char* username, char
 	sqlite3_bind_text(stmt, 1, nome, -1, SQLITE_STATIC);
 	sqlite3_bind_text(stmt, 2, cognome, -1, SQLITE_STATIC);
 	sqlite3_bind_text(stmt, 3, username, -1, SQLITE_STATIC);
-	sqlite3_bind_int(stmt, 4, 4000); // saldo iniziale
+	sqlite3_bind_int(stmt, 4, 1000); // saldo iniziale
 	sqlite3_bind_text(stmt, 5, password, -1, SQLITE_STATIC);
 
 	rc = sqlite3_step(stmt);
 
 	if (rc != SQLITE_DONE) {
 		printf("Errore inserimento: %s\n", sqlite3_errmsg(db));
-	}
-	else {
-		printf("Dati inseriti con successo.\n");
 	}
 
 	sqlite3_finalize(stmt);

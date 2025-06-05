@@ -1,2 +1,4 @@
-﻿  main.c
-  Black_Jack_OG.vcxproj -> C:\Users\perro\OneDrive\Desktop\Black Jack OG  vs\Black-Jack-OG\x64\Debug\Black_Jack_OG.exe
+﻿  utils.c
+C:\Users\onny\Desktop\progetto\Black-Jack-OG\utils.c(56,48): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+C:\Users\onny\Desktop\progetto\Black-Jack-OG\utils.c(69,14): warning C4047: '=': 'int *' differisce da 'int' nei livelli di riferimento indiretto
+  Black_Jack_OG.vcxproj -> C:\Users\onny\Desktop\progetto\Black-Jack-OG\x64\Debug\Black_Jack_OG.exe

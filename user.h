@@ -11,8 +11,6 @@ typedef struct {
 
 void registraUtente();
 
-void getPassword(char* password, int maxLength);
-
-int login(Utente* utente);
+void login(Utente* utente);
 
 void signUp(Utente* utente);

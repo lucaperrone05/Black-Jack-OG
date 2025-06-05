@@ -4,56 +4,11 @@
 #include <string.h>
 #include "user.h"
 #include "db.h"
-
-
-// Funzione per nascondere password con pallini
-#include <stdio.h>
-#include <windows.h>
-#include <conio.h>
-
-void getPassword(char* password, int maxLength) {
-    HANDLE hConsole = GetStdHandle(STD_INPUT_HANDLE);
-    DWORD mode;
-    char ch;
-    int i = 0;
-
-    // Disabilita l'echo dei caratteri e l'input in buffer
-    GetConsoleMode(hConsole, &mode);
-    SetConsoleMode(hConsole, mode & ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT));
-
-    while (i < maxLength - 1) {
-        ch = _getch();
-
-        if (ch == '\r') {
-            // Tasto Invio: esce dal ciclo senza usare break
-            i = maxLength - 1; // forza l'uscita al prossimo giro
-        }
-        else if (ch == 8) {
-            // Tasto backspace
-            if (i > 0) {
-                i--;
-                // Cancella l'asterisco dalla console
-                printf("\b \b");
-            }
-        }
-        else {
-            password[i] = ch;
-            i++;
-            printf("*");
-        }
-    }
-
-    password[i == maxLength - 1 ? i : i] = '\0';
-
-    // Riabilita l'echo dei caratteri
-    SetConsoleMode(hConsole, mode);
-    printf("\n");
-}
-
+#include "utils.h"
 
 
 // Funzione Login
-int login(Utente* utente) {
+void login(Utente* utente) {
 
     sqlite3* db;
 
@@ -82,7 +37,12 @@ int login(Utente* utente) {
 
 	sqlite3_close(db);
 
-	return temp; // 1 se login riuscito, 0 altrimenti
+    system("cls");
+    printCentered("Login effettuato con successo!\n\n");
+	printf("Benvenuto, %s!\n", utente->nome);
+    
+    Sleep(1500);
+	
 }
 
 
@@ -151,7 +111,10 @@ void signUp(Utente* utente) {
 
     /* Arrivi qui solo se tutto è valido */
     registraUtente(db, nome, cognome, username, password);
-    Sleep(2000);
+	system("cls");
+    printCentered("Registrazione effettuata correttamente.\n\n");
+    printCentered("Hai ricevuto 1000 monete bonus");
+    Sleep(3000);
     login(utente);                        // login immediato
 
     sqlite3_close(db);
