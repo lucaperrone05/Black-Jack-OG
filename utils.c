@@ -73,3 +73,35 @@ void getScelta(int* menu) {
     while (getchar() != '\n');
 
 }
+
+void printMenuLogin() {
+    printCentered("Gioca a BlackJack!\n\n");
+
+    printf("Selezionare un'opzione:\n");
+
+    printCentered("1. Login\n");
+    printCentered("2. Sign Up\n");
+    printCentered("3. Exit\n");
+}
+
+void printMenuGioco(char* username, int saldo) {
+    
+    system("cls");
+    printCentered("Benvenuto nel gioco di BlackJack!\n\n");
+    printf("Username utente: %s\n", username);
+    printf("Saldo: %d\n", saldo);
+    printf("\n\n");
+
+    printCentered("Selezionare un'opzione:\n\n");
+    printCentered("1. Nuova partita\n");
+    printCentered("2. Carica partita\n");
+    printCentered("3. Visualizza storico partite\n");
+    printCentered("4. Exit\n");
+}
+
+void printChiusuraProgramma() {
+    system("cls");
+    printf("\n\n\n");
+    printCentered("Chiusura del programma...");
+    printf("\n\n\n");
+}

@@ -5,31 +5,27 @@
 #include "utils.h"
 #include "user.h"
 #include "db.h"
+#include "deck.h"
+#include "game.h"
 
 
 int main() {
 
     int exit, menu = 0;
 
-    Utente utente = { 0 };
+	Utente utente = { 0 }; // Inizializza la struttura utente
 
-    
 
     do {
         exit = 0;
-        printCentered("Gioca a BlackJack!\n\n");
 
-        printf("Selezionare un'opzione:\n");
+		printMenuLogin();  // Stampa il menu di login
 
-        printCentered("1. Login\n");
-        printCentered("2. Sign Up\n");
-        printCentered("3. Exit\n");
-
-        getScelta(&menu);
+		getScelta(&menu); // Ottiene la scelta dell'utente
 
         switch (menu) {
         case 1:
-            login(&utente);
+			login(&utente);  // Funzione per il login
             break;
 
         case 2:
@@ -37,10 +33,7 @@ int main() {
             break;
 
         case 3:
-            system("cls");
-			printf("\n\n\n");
-            printCentered("Chiusura del programma...");
-            printf("\n\n\n");
+			printChiusuraProgramma(); // Stampa il messaggio di chiusura
             exit = 1;
             break;
 
@@ -54,31 +47,27 @@ int main() {
 
 
     if (utente.loggato) {
-
-       
-        system("cls");
-        printCentered("Benvenuto nel gioco di BlackJack!\n\n");
-        printf("Nome utente: %s\n", utente.username);
-        printf("Saldo: %d\n", utente.saldo);
-        printf("\n\n");
-
-        printCentered("Selezionare un'opzione:\n\n");
-        printCentered("1. Nuova partita\n");
-        printCentered("2. Carica partita\n");
-        printCentered("3. Visualizza storico partite\n");
-        printCentered("4. Exit\n");
     
         exit = 0; // reset exit per il gioco
         menu = 0; // reset menu per il gioco
 
         do {
+			
+            printMenuGioco(utente.username, utente.saldo);
             getScelta(&menu);
 
 
             switch (menu) {
                 case 1:
-                    
-					break;
+					system("cls"); // Pulisce lo schermo
+				    Carta mazzo[52] = { 0 }; // Inizializza il mazzo di carte
+					creaMazzo(mazzo); // Crea il mazzo di carte
+					mescolaMazzo(mazzo); // Mescola il mazzo di carte
+
+					stampaCarta(mazzo[1]); // Stampa la prima carta del mazzo
+					system("pause"); // Pausa per visualizzare la carta
+
+                    break;
                 case 2:
 
                     break;
@@ -86,10 +75,7 @@ int main() {
 
                     break;
                 case 4:
-                    system("cls");
-                    printf("\n\n\n");
-                    printCentered("Chiusura del programma...");
-                    printf("\n\n\n");
+                    printChiusuraProgramma(); // Stampa il messaggio di chiusura
                     exit = 1;
                     break;
                 defualt:

@@ -1,3 +1,5 @@
+#ifndef _DECK_H
+#define _DECK_H
 // Definizione della struttura
 typedef struct {
     char* seme;
@@ -9,3 +11,4 @@ typedef struct {
 void creaMazzo(Carta mazzo[]);
 void mescolaMazzo(Carta mazzo[]);
 
+#endif
