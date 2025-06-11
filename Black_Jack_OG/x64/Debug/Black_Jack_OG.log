@@ -1,2 +1,5 @@
 ﻿  game.c
+  main.c
+C:\Users\onny\Desktop\progetto\Black-Jack-OG\main.c(82,17): warning C4102: 'defualt': etichetta senza riferimenti
+  Generazione del codice in corso...
   Black_Jack_OG.vcxproj -> C:\Users\onny\Desktop\progetto\Black-Jack-OG\x64\Debug\Black_Jack_OG.exe

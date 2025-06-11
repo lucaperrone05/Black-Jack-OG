@@ -10,5 +10,5 @@ typedef struct {
 // Dichiarazione delle funzioni
 void creaMazzo(Carta mazzo[]);
 void mescolaMazzo(Carta mazzo[]);
-
+void rimuoviCarteInizio(Carta** mazzo, int* size, int n);
 #endif

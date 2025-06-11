@@ -25,90 +25,54 @@ void setColor(int colore) {
     SetConsoleTextAttribute(hConsole, colore);
 }
 
-void stampaCarta(Carta c) {
-    // Cambia colore in ROSSO per cuori ?? e quadri ??
-    if (strcmp(c.seme, "?") == 0 || strcmp(c.seme, "?") == 0) {
-        setColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-    }
-    else {
-        setColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Bianco (default)
-    }
-
-    printf(" _________\n");
-    printf("|         |\n");
-    printf("| %-2s      |\n", c.valore);
-    printf("|         |\n");
-    printf("|    %s    |\n", c.seme);
-    printf("|         |\n");
-    printf("|      %-2s |\n", c.valore);
-    printf("|_________|\n");
-
-    // Reset al colore standard
-    setColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-}
-
-
-//void blackjackGame() {
-//    Carta mazzo[NUM_CARTE];
-//    creaMazzo(mazzo);
-//    mescolaMazzo(mazzo);
-//
-//    Carta manoGiocatore[MAX_MANO], manoBanco[MAX_MANO];
-//    int carteGiocatore = 2, carteBanco = 2;
-//
-//    manoGiocatore[0] = mazzo[0];
-//    manoGiocatore[1] = mazzo[1];
-//    manoBanco[0] = mazzo[2];
-//    manoBanco[1] = mazzo[3];
-//
-//    printf("Le tue carte:\n");
-//    stampaCarta(manoGiocatore[0]);
-//    stampaCarta(manoGiocatore[1]);
-//    printf("Punteggio: %d\n", calcolaPunteggio(manoGiocatore, carteGiocatore));
-//
-//    printf("\nBanco mostra:\n");
-//    stampaCarta(manoBanco[0]);
-//
-//    while (calcolaPunteggio(manoGiocatore, carteGiocatore) < 21) {
-//        int scelta;
-//        printf("\nVuoi pescare una carta? (1 = Sì, 2 = No): ");
-//        scanf("%d", &scelta);
-//
-//        if (scelta == 1) {
-//            manoGiocatore[carteGiocatore++] = mazzo[4 + carteGiocatore - 2];
-//            stampaCarta(manoGiocatore[carteGiocatore - 1]);
-//            printf("Punteggio aggiornato: %d\n", calcolaPunteggio(manoGiocatore, carteGiocatore));
-//        }
-//        else {
-//            break;
-//        }
-//    }
-//
-//    if (calcolaPunteggio(manoGiocatore, carteGiocatore) > 21) {
-//        printf("\nHai sballato! Il Banco vince.\n");
-//        return;
-//    }
-//
-//    while (calcolaPunteggio(manoBanco, carteBanco) < 17) {
-//        manoBanco[carteBanco++] = mazzo[4 + carteGiocatore - 2 + carteBanco - 2];
-//    }
-//
-//    printf("\nBanco ha:\n");
-//    for (int i = 0; i < carteBanco; i++) {
-//        stampaCarta(manoBanco[i]);
-//    }
-//    printf("Punteggio Banco: %d\n", calcolaPunteggio(manoBanco, carteBanco));
-//
-//    int punteggioGiocatore = calcolaPunteggio(manoGiocatore, carteGiocatore);
-//    int punteggioBanco = calcolaPunteggio(manoBanco, carteBanco);
-//
-//    if (punteggioBanco > 21 || punteggioGiocatore > punteggioBanco) {
-//        printf("\nHai vinto!\n");
-//    }
-//    else if (punteggioGiocatore == punteggioBanco) {
-//        printf("\nPareggio!\n");
+//void stampaCarta(Carta c) {
+//    // Cambia colore in ROSSO per cuori ?? e quadri ??
+//    if (strcmp(c.seme, "?") == 0 || strcmp(c.seme, "?") == 0) {
+//        setColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
 //    }
 //    else {
-//        printf("\nIl Banco vince!\n");
+//        setColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Bianco (default)
 //    }
+//
+//    printf(" _________\n");
+//    printf("|         |\n");
+//    printf("| %-2s      |\n", c.valore);
+//    printf("|         |\n");
+//    printf("|    %s    |\n", c.seme);
+//    printf("|         |\n");
+//    printf("|      %-2s |\n", c.valore);
+//    printf("|_________|\n");
+//
+//    // Reset al colore standard
+//    setColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 //}
+
+
+void stampaCarteAffiancate(Carta carte[], int n) {
+    for (int riga = 0; riga < 8; riga++) {
+        for (int i = 0; i < n; i++) {
+            Carta c = carte[i];
+            switch (riga) {
+            case 0: printf(" _________ "); break;
+            case 1: printf("|         |"); break;
+            case 2: printf("| %-2s      |", c.valore); break;
+            case 3: printf("|         |"); break;
+            case 4: printf("|    %s    |", c.seme); break;
+            case 5: printf("|         |"); break;
+            case 6: printf("|      %-2s |", c.valore); break;
+            case 7: printf("|_________|"); break;
+            }
+        }
+        printf("\n"); // Vai a capo dopo ogni riga
+    }
+}
+
+void nuovaPartita() {
+    Carta mazzo[52] = { 0 }; // Inizializza il mazzo di carte
+
+    creaMazzo(mazzo); // Crea il mazzo di carte
+    mescolaMazzo(mazzo); // Mescola il mazzo di carte
+
+    stampaCarteAffiancate(mazzo, 2);
+
+}

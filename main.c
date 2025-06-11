@@ -60,11 +60,9 @@ int main() {
             switch (menu) {
                 case 1:
 					system("cls"); // Pulisce lo schermo
-				    Carta mazzo[52] = { 0 }; // Inizializza il mazzo di carte
-					creaMazzo(mazzo); // Crea il mazzo di carte
-					mescolaMazzo(mazzo); // Mescola il mazzo di carte
+				    
+                    nuovaPartita();
 
-					stampaCarta(mazzo[1]); // Stampa la prima carta del mazzo
 					system("pause"); // Pausa per visualizzare la carta
 
                     break;
@@ -86,7 +84,6 @@ int main() {
             }
         }while(exit == 0);
         
-
     }
 
     return 0;
