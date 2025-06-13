@@ -1,23 +1,20 @@
-﻿#include "deck.h"
+#include "deck.h"
 #include <stdlib.h>
 #include <time.h>
 #define NUM_CARTE 104 // 2 mazzi da 52 carte
 #define MAX_MANO 11
 
 // Creazione del mazzo
-void creaMazzo(Carta mazzo[]) {
-    char* semi[] = { "\x06", "\x03", "\x04", "\x05" }; // ♠ ♥ ♦ ♣
+void  creaMazzo(Carta** top) {
+    const char* semi[] = { "♠", "♥", "♦", "♣" };
     char* valori[] = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
-    int punteggi[] = { 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10 };
+    int punteggi[] = { 11, 2, 3, 4, 5, 6, 7, 8,  9, 10, 10, 10, 10 };
 
-    int index = 0;
-    for (int copia = 0; copia < 2; copia++) { // Due mazzi
+    for (int copia = 0; copia < 2; copia++) {
         for (int s = 0; s < 4; s++) {
             for (int v = 0; v < 13; v++) {
-                mazzo[index].seme = semi[s];
-                mazzo[index].valore = valori[v];
-                mazzo[index].punti = punteggi[v];
-                index++;
+                // Nota: cast via (char*) per evitare warning const/non-const
+                push(top, (char*)semi[s], valori[v], punteggi[v]);
             }
         }
     }
@@ -25,32 +22,66 @@ void creaMazzo(Carta mazzo[]) {
 
 
 // Mescolatura del mazzo
-void mescolaMazzo(Carta mazzo[]) {
-    srand(time(NULL)); // ?? Aggiunta dichiarazione di `time()`
-    for (int i = 0; i < NUM_CARTE; i++) {
-        int j = rand() % NUM_CARTE;
-        Carta temp = mazzo[i];
-        mazzo[i] = mazzo[j];
-        mazzo[j] = temp;
+void mescolaMazzo(Carta** top) {
+    srand(time(NULL));
+
+    int size = contaCarte(*top);
+    Carta** array = pilaToArray(*top, size);
+
+    // Fisher-Yates Shuffle
+    for (int i = size - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        Carta* tmp = array[i];
+        array[i] = array[j];
+        array[j] = tmp;
     }
+
+    // Ricostruzione pila
+    *top = NULL;
+    for (int i = 0; i < size; i++) {
+        array[i]->next = *top;
+        *top = array[i];
+    }
+
+    free(array);
 }
 
-void rimuoviCarteInizio(Carta** mazzo, int* size, int n) {
-    if (n >= *size) {
-        // Tutte le carte eliminate
-        free(*mazzo);
-        *mazzo = NULL;
-        *size = 0;
-        return;
-    }
 
-    // Sposta le carte rimanenti all'inizio
-    memmove(*mazzo, *mazzo + n, (*size - n) * sizeof(Carta));
-
-    // Ridimensiona il vettore
-    Carta* nuovo = realloc(*mazzo, (*size - n) * sizeof(Carta));
-    if (nuovo != NULL) {
-        *mazzo = nuovo;
+int contaCarte(Carta* top) {
+    int count = 0;
+    while (top) {
+        count++;
+        top = top->next;
     }
-    *size -= n;
+    return count;
+}
+
+Carta** pilaToArray(Carta* top, int size) {
+    Carta** array = malloc(size * sizeof(Carta*));
+    int i = 0;
+    while (top) {
+        array[i++] = top;
+        top = top->next;
+    }
+    return array;
+}
+
+
+void push(Carta** top, char* seme, char* valore, int punti) {
+    Carta* nuova = malloc(sizeof(Carta));
+    nuova->seme = seme;
+    nuova->valore = valore;
+    nuova->punti = punti;
+    nuova->next = *top;
+    *top = nuova;
+}
+
+Carta* pop(Carta** top) {
+    if (*top == NULL) return NULL;  // pila vuota
+
+    Carta* primo = *top;       // prendi il primo elemento
+    *top = primo->next;        // aggiorna la testa della pila al prossimo elemento
+    primo->next = NULL;        // stacca il nodo estratto dalla lista
+
+    return primo;              // ritorna il nodo estratto
 }

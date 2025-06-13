@@ -3,9 +3,10 @@
 #include <stdio.h>
 #include <string.h>
 #include "deck.h"
+#include "utils.h"
+#include "user.h"
 #define NUM_CARTE 52
-#define MAX_MANO 2
-
+#define MAX_MANO 10
 
 int calcolaPunteggio(Carta mano[], int numCarte) {
     int punteggio = 0, numAssi = 0;
@@ -20,35 +21,11 @@ int calcolaPunteggio(Carta mano[], int numCarte) {
     return punteggio;
 }
 
-void setColor(int colore) {
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, colore);
-}
-
-//void stampaCarta(Carta c) {
-//    // Cambia colore in ROSSO per cuori ?? e quadri ??
-//    if (strcmp(c.seme, "?") == 0 || strcmp(c.seme, "?") == 0) {
-//        setColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
-//    }
-//    else {
-//        setColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Bianco (default)
-//    }
-//
-//    printf(" _________\n");
-//    printf("|         |\n");
-//    printf("| %-2s      |\n", c.valore);
-//    printf("|         |\n");
-//    printf("|    %s    |\n", c.seme);
-//    printf("|         |\n");
-//    printf("|      %-2s |\n", c.valore);
-//    printf("|_________|\n");
-//
-//    // Reset al colore standard
-//    setColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-//}
-
 
 void stampaCarteAffiancate(Carta carte[], int n) {
+
+    system("chcp 65001 >nul"); // UTF-8 per la console
+
     for (int riga = 0; riga < 8; riga++) {
         for (int i = 0; i < n; i++) {
             Carta c = carte[i];
@@ -63,16 +40,67 @@ void stampaCarteAffiancate(Carta carte[], int n) {
             case 7: printf("|_________|"); break;
             }
         }
-        printf("\n"); // Vai a capo dopo ogni riga
+        printf("\n");
     }
 }
 
-void nuovaPartita() {
-    Carta mazzo[52] = { 0 }; // Inizializza il mazzo di carte
 
-    creaMazzo(mazzo); // Crea il mazzo di carte
-    mescolaMazzo(mazzo); // Mescola il mazzo di carte
+void nuovaPartita(Utente utente) {
+    Carta* mazzo = NULL;
+    Carta manoBanco[MAX_MANO] = { 0 }; // Mano del banco
+	Carta manoGiocatore[MAX_MANO] = { 0 }; // Mano del giocatore
 
-    stampaCarteAffiancate(mazzo, 2);
+
+    creaMazzo(&mazzo); // Crea il mazzo di carte
+    mescolaMazzo(&mazzo); // Mescola il mazzo di carte
+
+    printCentered("BlackJack\n");
+    printf("%s\nSaldo:%d\n\n\n", utente.username, utente.saldo);
+	printCentered("Procedo al mescolamento delle carte . . .");
+	Sleep(2000); // Attendi 2 secondi per dare tempo di leggere il messaggio
+	system("cls"); // Pulisci la console
+
+    printCentered("BlackJack\n\n");
+    printf("%s\nSaldo:%d\n\n\n", utente.username, utente.saldo);
+
+    printf("       Banco:\n");
+    
+    Carta* cartaEstratta;
+    cartaEstratta = pop(&mazzo);
+    manoBanco[0] = *cartaEstratta;  // copia il contenuto della struttura
+   
+    cartaEstratta = pop(&mazzo);
+    manoBanco[1] = *cartaEstratta; // Prima carta del banco
+
+    stampaCarteAffiancate(manoBanco, 2);
+
+	printf("\n\n\n       Giocatore:\n");
+
+    int scelta;
+
+    for (int i=0; i < 2; i++) {
+        cartaEstratta = pop(&mazzo);
+        manoGiocatore[i] = *cartaEstratta;  // copia il contenuto della struttura
+    }
+    stampaCarteAffiancate(manoGiocatore, 2);
+
+    int offset = 2;
+    do {
+		printf("Inserisci 1 per chiedere carta");
+        getScelta(&scelta);
+
+        if (scelta == 1) {
+            cartaEstratta = pop(&mazzo);
+            manoGiocatore[offset] = *cartaEstratta; // Aggiungi una carta alla mano del giocatore
+            offset++;
+			system("cls"); // Pulisci la console
+            printf("       Banco:\n");
+            stampaCarteAffiancate(manoBanco, 2);
+            printf("\n\n\n       Giocatore:\n");
+            stampaCarteAffiancate(manoGiocatore, offset);
+		}
+
+    } while (scelta==1);
 
 }
+

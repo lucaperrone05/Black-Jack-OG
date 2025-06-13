@@ -61,7 +61,7 @@ int main() {
                 case 1:
 					system("cls"); // Pulisce lo schermo
 				    
-                    nuovaPartita();
+					nuovaPartita(utente); // Inizializza una nuova partita
 
 					system("pause"); // Pausa per visualizzare la carta
 
