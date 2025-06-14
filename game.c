@@ -21,7 +21,6 @@ int calcolaPunteggio(Carta mano[], int numCarte) {
     return punteggio;
 }
 
-
 void stampaCarteAffiancate(Carta carte[], int n) {
 
     system("chcp 65001 >nul"); // UTF-8 per la console
@@ -83,15 +82,21 @@ void stampaCarteAffiancateConCoperta(Carta carte[], int n) {
 }
 
 
-void nuovaPartita(Utente* utente) {
+void partita(Utente* utente, int nuova) {
     Carta* mazzo = NULL;
     Carta* cartaEstratta;
     Carta manoBanco[MAX_MANO] = { 0 }; // Mano del banco
     Carta manoGiocatore[MAX_MANO] = { 0 }; // Mano del giocatore
     int scelta, offset = 2;
 
-    creaMazzo(&mazzo); // Crea il mazzo di carte
-    mescolaMazzo(&mazzo); // Mescola il mazzo di carte
+    if (nuova==1) {
+        creaMazzo(&mazzo); // Crea il mazzo di carte
+        mescolaMazzo(&mazzo); // Mescola il mazzo di carte
+    }
+    else {
+        //mazzo = carichiamo il mazzo salvato nel DB
+    }
+    
 
     printUsernameSaldo(*utente);
 
@@ -99,10 +104,14 @@ void nuovaPartita(Utente* utente) {
 
 	getPuntata(&utente);
 
-    manoIniziale(&mazzo, &cartaEstratta, manoBanco, manoGiocatore);
+    manoIniziale(*utente, &mazzo, &cartaEstratta, manoBanco, manoGiocatore);
 
     do {
-        printf("\nInserisci 1 per chiedere carta");
+        printf("\n\n");
+        printCentered("Inserisci:");
+
+        printf("\n");
+        printCentered("1. Carta      2. Stai      3. Raddioppio      4. Split");
         getScelta(&scelta);
 
         if (scelta == 1) {

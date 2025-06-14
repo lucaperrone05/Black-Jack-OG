@@ -106,8 +106,8 @@ void printChiusuraProgramma() {
 }
 
 void printUsernameSaldo(Utente utente) {
-    printCentered("BlackJack\n");
-    printf("%s\nSaldo:%d\n\n\n", utente.username, utente.saldo);
+    printCentered("BlackJack");
+    printf("%s\nSaldo:%d\n\n", utente.username, utente.saldo);
 }
 
 void printMescolamento() {
@@ -116,8 +116,10 @@ void printMescolamento() {
     system("cls"); // Pulisci la console
 }
 
-void manoIniziale(Carta** mazzo, Carta** cartaEstratta, Carta manoBanco[], Carta manoGiocatore[]) {
+void manoIniziale(Utente utente ,Carta** mazzo, Carta** cartaEstratta, Carta manoBanco[], Carta manoGiocatore[]) {
     
+	printUsernameSaldo(utente);
+
     printf("       Banco:\n");
     
     for (int i = 0; i < 2; i++) {
@@ -152,15 +154,19 @@ int getPuntata(Utente** utente) {
         exit = 1;
 
         printUsernameSaldo(**utente);
-        printf("\n\n\n");
+
+        printf("\n\n");
         printCentered("Inserire puntata: ");
 
         printf("\n");
         printCentered("Puntate disponibili:");
+
+		printf("\n");
         printCentered(" ______    ______    ______    _______    _______");
         printCentered("|      |  |      |  |      |  |       |  |       |");
         printCentered("|  10  |  |  20  |  |  50  |  |  100  |  |  200  |");
         printCentered("|______|  |______|  |______|  |_______|  |_______|");
+        printf("\n");
 
         getScelta(&puntata);
 

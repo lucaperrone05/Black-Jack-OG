@@ -87,12 +87,12 @@ int loginDb(sqlite3* db, const char* username, const char* password) {
 		}
 		else {
 			printf("Credenziali errate.\n");
-			Sleep(2000);
+			Sleep(1500);
 		}
 	}
 	else {
 		printf("Errore durante l'esecuzione della query.\n");
-		Sleep(2000);
+		Sleep(1500);
 	}
 
 	sqlite3_finalize(stmt);

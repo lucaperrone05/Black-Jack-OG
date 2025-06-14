@@ -58,18 +58,18 @@ int main() {
 
             switch (menu) {
                 case 1:
+                case 2:
+
 					system("cls"); // Pulisce lo schermo
 				    
-					nuovaPartita(&utente); // Inizializza una nuova partita
+					partita(&utente, menu); // Inizializza una nuova partita
 
 					system("pause"); // Pausa per visualizzare la carta
 
                     break;
-                case 2:
 
-                    break;
                 case 3:
-
+                    // Stampa storico partite
                     break;
                 case 4:
                     printChiusuraProgramma(); // Stampa il messaggio di chiusura

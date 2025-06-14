@@ -9,6 +9,6 @@ void printMenuGioco(char* username, int saldo);
 void printChiusuraProgramma();
 void printUsernameSaldo(Utente utente);
 void printMescolamento();
-void manoIniziale(Carta** mazzo, Carta** cartaEstratta, Carta manoBanco[], Carta manoGiocatore[]);
+void manoIniziale(Utente utente, Carta** mazzo, Carta** cartaEstratta, Carta manoBanco[], Carta manoGiocatore[]);
 void printCarteBancoGiocatore(Carta manoBanco[], Carta manoGiocatore[], int offsetBanco, int offsetGiocatore);
 int getPuntata(Utente* utente);
