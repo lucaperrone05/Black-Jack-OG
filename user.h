@@ -1,4 +1,5 @@
-#include <stdio.h>
+#ifndef _USER_H
+#define _USER_H
 
 typedef struct {
 	int id;
@@ -14,3 +15,5 @@ void registraUtente();
 void login(Utente* utente);
 
 void signUp(Utente* utente);
+
+#endif

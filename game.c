@@ -1,4 +1,4 @@
-// Logica del gioco (Blackjack)
+﻿// Logica del gioco (Blackjack)
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
@@ -45,62 +45,109 @@ void stampaCarteAffiancate(Carta carte[], int n) {
 }
 
 
-void nuovaPartita(Utente utente) {
-    Carta* mazzo = NULL;
-    Carta manoBanco[MAX_MANO] = { 0 }; // Mano del banco
-	Carta manoGiocatore[MAX_MANO] = { 0 }; // Mano del giocatore
+void stampaCarteAffiancateConCoperta(Carta carte[], int n) {
+    system("chcp 65001 >nul"); // UTF-8 per la console
 
+    for (int riga = 0; riga < 8; riga++) {
+        for (int i = 0; i < n; i++) {
+            Carta c = carte[i];
+            int coperta = (i == 1); // la seconda carta (indice 1) è sempre coperta
+
+            if (coperta) {
+                switch (riga) {
+                case 0: printf(" _________ "); break;
+                case 1: printf("|         |"); break;
+                case 2: printf("|         |"); break;
+                case 3: printf("|         |"); break;
+                case 4: printf("|   ? ?   |"); break;
+                case 5: printf("|         |"); break;
+                case 6: printf("|         |"); break;
+                case 7: printf("|_________|"); break;
+                }
+            }
+            else {
+                switch (riga) {
+                case 0: printf(" _________ "); break;
+                case 1: printf("|         |"); break;
+                case 2: printf("| %-2s      |", c.valore); break;
+                case 3: printf("|         |"); break;
+                case 4: printf("|    %s    |", c.seme); break;
+                case 5: printf("|         |"); break;
+                case 6: printf("|      %-2s |", c.valore); break;
+                case 7: printf("|_________|"); break;
+                }
+            }
+        }
+        printf("\n");
+    }
+}
+
+
+void nuovaPartita(Utente* utente) {
+    Carta* mazzo = NULL;
+    Carta* cartaEstratta;
+    Carta manoBanco[MAX_MANO] = { 0 }; // Mano del banco
+    Carta manoGiocatore[MAX_MANO] = { 0 }; // Mano del giocatore
+    int scelta, offset = 2;
 
     creaMazzo(&mazzo); // Crea il mazzo di carte
     mescolaMazzo(&mazzo); // Mescola il mazzo di carte
 
-    printCentered("BlackJack\n");
-    printf("%s\nSaldo:%d\n\n\n", utente.username, utente.saldo);
-	printCentered("Procedo al mescolamento delle carte . . .");
-	Sleep(2000); // Attendi 2 secondi per dare tempo di leggere il messaggio
-	system("cls"); // Pulisci la console
+    printUsernameSaldo(*utente);
 
-    printCentered("BlackJack\n\n");
-    printf("%s\nSaldo:%d\n\n\n", utente.username, utente.saldo);
+    printMescolamento();
 
-    printf("       Banco:\n");
-    
-    Carta* cartaEstratta;
-    cartaEstratta = pop(&mazzo);
-    manoBanco[0] = *cartaEstratta;  // copia il contenuto della struttura
-   
-    cartaEstratta = pop(&mazzo);
-    manoBanco[1] = *cartaEstratta; // Prima carta del banco
+	getPuntata(&utente);
 
-    stampaCarteAffiancate(manoBanco, 2);
+    manoIniziale(&mazzo, &cartaEstratta, manoBanco, manoGiocatore);
 
-	printf("\n\n\n       Giocatore:\n");
-
-    int scelta;
-
-    for (int i=0; i < 2; i++) {
-        cartaEstratta = pop(&mazzo);
-        manoGiocatore[i] = *cartaEstratta;  // copia il contenuto della struttura
-    }
-    stampaCarteAffiancate(manoGiocatore, 2);
-
-    int offset = 2;
     do {
-		printf("Inserisci 1 per chiedere carta");
+        printf("\nInserisci 1 per chiedere carta");
         getScelta(&scelta);
 
         if (scelta == 1) {
             cartaEstratta = pop(&mazzo);
             manoGiocatore[offset] = *cartaEstratta; // Aggiungi una carta alla mano del giocatore
             offset++;
-			system("cls"); // Pulisci la console
+            system("cls"); // Pulisci la console
+            
+            printUsernameSaldo(*utente);
+
+            printCarteBancoGiocatore(manoBanco, manoGiocatore, 2, offset);
+        }
+
+    } while (scelta == 1 && calcolaPunteggio(manoGiocatore, offset) <= 21);
+
+    int numCarteGiocatore = offset;
+
+    if (calcolaPunteggio(manoGiocatore, offset) > 21) {
+        printf("\nHai sballato! Hai perso.\n");
+    }
+    else {
+		system("cls"); // Pulisci la console
+		
+        printUsernameSaldo(*utente);
+
+		printCarteBancoGiocatore(manoBanco, manoGiocatore, 2, numCarteGiocatore);
+        offset = 2; // Reset offset per il banco
+		
+        Sleep(1000); 
+        
+        int punteggioBanco = calcolaPunteggio(manoBanco, 2);
+        
+        while (punteggioBanco < 17) { // Il banco deve pescare fino a raggiungere almeno 17
+            cartaEstratta = pop(&mazzo);
+            manoBanco[offset] = *cartaEstratta; // Aggiungi una carta alla mano del banco
+            offset++;
+            system("cls"); // Pulisci la console
+            printCentered("BlackJack\n");
+            printf("%s\nSaldo:%d\n\n\n", utente->username, utente->saldo);
             printf("       Banco:\n");
-            stampaCarteAffiancate(manoBanco, 2);
+            stampaCarteAffiancate(manoBanco, offset);
             printf("\n\n\n       Giocatore:\n");
-            stampaCarteAffiancate(manoGiocatore, offset);
-		}
-
-    } while (scelta==1);
-
+            stampaCarteAffiancate(manoGiocatore, numCarteGiocatore);
+            punteggioBanco = calcolaPunteggio(manoBanco, offset);
+            Sleep(1000);
+        }
+    }
 }
-

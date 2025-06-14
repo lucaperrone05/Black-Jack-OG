@@ -5,6 +5,7 @@
 #include <string.h>
 #include "user.h"
 #include "db.h"
+#include "deck.h"
 
 
 void getPassword(char* password, int maxLength) {
@@ -44,7 +45,6 @@ void getPassword(char* password, int maxLength) {
     printf("\n");
 }
 
-
 void printCentered(const char* message) {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -61,7 +61,6 @@ void printCentered(const char* message) {
     printf("%s\n", message);
 }
 
-
 void getScelta(int* menu) {
     printf("\nScelta: ");
 
@@ -77,7 +76,7 @@ void getScelta(int* menu) {
 void printMenuLogin() {
     printCentered("Gioca a BlackJack!\n\n");
 
-    printf("Selezionare un'opzione:\n");
+    printf("Selezionare un'opzione:");
 
     printCentered("1. Login\n");
     printCentered("2. Sign Up\n");
@@ -88,7 +87,7 @@ void printMenuGioco(char* username, int saldo) {
     
     system("cls");
     printCentered("Benvenuto nel gioco di BlackJack!\n\n");
-    printf("Username utente: %s\n", username);
+    printf("Username: %s\n", username);
     printf("Saldo: %d\n", saldo);
     printf("\n\n");
 
@@ -104,4 +103,97 @@ void printChiusuraProgramma() {
     printf("\n\n\n");
     printCentered("Chiusura del programma...");
     printf("\n\n\n");
+}
+
+void printUsernameSaldo(Utente utente) {
+    printCentered("BlackJack\n");
+    printf("%s\nSaldo:%d\n\n\n", utente.username, utente.saldo);
+}
+
+void printMescolamento() {
+    printCentered("Procedo al mescolamento delle carte . . .");
+    Sleep(2000); // Attendi 2 secondi per dare tempo di leggere il messaggio
+    system("cls"); // Pulisci la console
+}
+
+void manoIniziale(Carta** mazzo, Carta** cartaEstratta, Carta manoBanco[], Carta manoGiocatore[]) {
+    
+    printf("       Banco:\n");
+    
+    for (int i = 0; i < 2; i++) {
+        *cartaEstratta = pop(mazzo);
+        manoBanco[i] = **cartaEstratta;  // copia il contenuto della struttura
+    }
+    stampaCarteAffiancateConCoperta(manoBanco, 2);
+
+    printf("\n\n\n       Giocatore:\n");
+
+    for (int i = 0; i < 2; i++) {
+        *cartaEstratta = pop(mazzo);
+        manoGiocatore[i] = **cartaEstratta;  // copia il contenuto della struttura
+    }
+    stampaCarteAffiancate(manoGiocatore, 2);
+}
+
+void printCarteBancoGiocatore(Carta manoBanco[], Carta manoGiocatore[], int offsetBanco, int offsetGiocatore) {
+    printf("       Banco:\n");
+    stampaCarteAffiancate(manoBanco, offsetBanco);
+    printf("\n\n\n       Giocatore:\n");
+    stampaCarteAffiancate(manoGiocatore, offsetGiocatore);
+}
+
+int getPuntata(Utente** utente) {
+    
+    int puntata;
+    int exit;
+    
+    do {
+        puntata = 0;
+        exit = 1;
+
+        printUsernameSaldo(**utente);
+        printf("\n\n\n");
+        printCentered("Inserire puntata: ");
+
+        printf("\n");
+        printCentered("Puntate disponibili:");
+        printCentered(" ______    ______    ______    _______    _______");
+        printCentered("|      |  |      |  |      |  |       |  |       |");
+        printCentered("|  10  |  |  20  |  |  50  |  |  100  |  |  200  |");
+        printCentered("|______|  |______|  |______|  |_______|  |_______|");
+
+        getScelta(&puntata);
+
+        if (puntata <= (*utente)->saldo) {
+
+			switch (puntata) {  // Controlla se la puntata è valida
+            case 10:
+            case 20:
+            case 50:
+            case 100:
+            case 200:
+				exit = 1; // Puntata valida, esci dal ciclo
+                break;
+            default:
+                printCentered("\nPuntata non valida");
+                Sleep(1500);
+                system("cls");
+                exit = 0;
+                break;
+            }
+        }
+        else {
+            exit = 0;
+			printCentered("\nPuntata superiore al saldo disponibile.\n");
+            Sleep(1500);
+            system("cls");
+        }
+
+    } while (exit==0);
+
+    (*utente)->saldo -= puntata; // Sottrae la puntata dal saldo dell'utente
+
+    system("cls");
+
+	return puntata;
 }

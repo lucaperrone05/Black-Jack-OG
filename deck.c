@@ -46,16 +46,7 @@ void mescolaMazzo(Carta** top) {
     free(array);
 }
 
-
-int contaCarte(Carta* top) {
-    int count = 0;
-    while (top) {
-        count++;
-        top = top->next;
-    }
-    return count;
-}
-
+// Conversione della pila in array per la mescolatura
 Carta** pilaToArray(Carta* top, int size) {
     Carta** array = malloc(size * sizeof(Carta*));
     int i = 0;
@@ -66,6 +57,14 @@ Carta** pilaToArray(Carta* top, int size) {
     return array;
 }
 
+int contaCarte(Carta* top) {
+    int count = 0;
+    while (top) {
+        count++;
+        top = top->next;
+    }
+    return count;
+}
 
 void push(Carta** top, char* seme, char* valore, int punti) {
     Carta* nuova = malloc(sizeof(Carta));

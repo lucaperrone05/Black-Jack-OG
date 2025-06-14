@@ -15,7 +15,6 @@ int main() {
 
 	Utente utente = { 0 }; // Inizializza la struttura utente
 
-
     do {
         exit = 0;
 
@@ -61,7 +60,7 @@ int main() {
                 case 1:
 					system("cls"); // Pulisce lo schermo
 				    
-					nuovaPartita(utente); // Inizializza una nuova partita
+					nuovaPartita(&utente); // Inizializza una nuova partita
 
 					system("pause"); // Pausa per visualizzare la carta
 
