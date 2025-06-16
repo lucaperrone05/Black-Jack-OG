@@ -6,6 +6,7 @@
 #include "user.h"
 #include "db.h"
 #include "deck.h"
+#include "game.h"
 
 
 void getPassword(char* password, int maxLength) {
@@ -135,28 +136,36 @@ void manoIniziale(Utente utente ,Carta** mazzo, Carta** cartaEstratta, Carta man
     }
     stampaCarteAffiancateConCoperta(manoBanco, 2);
 
-    printf("\n       Giocatore:\n");
-
     for (int i = 0; i < 2; i++) {
         *cartaEstratta = pop(mazzo);
         manoGiocatore[i] = **cartaEstratta;  // copia il contenuto della struttura
     }
+    
+    printf("\n       Giocatore:  (%d)\n", calcolaPunteggio(manoGiocatore, 2));
     stampaCarteAffiancate(manoGiocatore, 2);
 }
 
 void risultato(Utente* utente, int punteggioBanco, int punteggioGiocatore, int puntata) {
+    printf("\n");
     if (punteggioBanco > punteggioGiocatore && punteggioBanco <= 21) {
         printCentered("Ha vinto il banco!");
     }
     else if (punteggioGiocatore > punteggioBanco && punteggioGiocatore <= 21) {
-        printCentered("Hai vinto tu!");
-        utente->saldo += puntata * 2; // Il giocatore vince la puntata
+        
+        if(punteggioGiocatore==21){
+            printCentered("BlackJack. Hai vinto!");
+            utente->saldo += puntata * 2.5; // Il giocatore vince la puntata
+        }
+        else {
+            printCentered("Hai vinto!");
+            utente->saldo += puntata * 2; // Il giocatore vince la puntata
+        }
     }
     else if (punteggioGiocatore > 21 && punteggioBanco <= 21) {
         printCentered("Hai sballato. Vince il banco!");
     }
     else if (punteggioBanco > 21 && punteggioGiocatore <= 21) {
-        printCentered("Il banco ha sballato. Hai vinto tu!");
+        printCentered("Il banco ha sballato. Hai vinto!");
         utente->saldo += puntata * 2;
     }
     else {
@@ -165,21 +174,34 @@ void risultato(Utente* utente, int punteggioBanco, int punteggioGiocatore, int p
     }
 }
 
-void printCarteBancoGiocatore(Utente* utente, int punteggioBanco, int punteggioGiocatore, int puntata, Carta manoBanco[], Carta manoGiocatore[], int offsetBanco, int offsetGiocatore, int finale) {   
+void printCarteBancoGiocatore(Utente* utente, int punteggioBanco, int punteggioGiocatore, int puntata, Carta manoBanco[], Carta manoGiocatore[], int numCarteBanco, int numCarteGiocatore, int finale) {
+
+    system("cls");
+
+    printUsernameSaldo(*utente);
+
+    printf("       Banco:  (%d)\n", punteggioBanco);
+    stampaCarteAffiancate(manoBanco, numCarteBanco);
+
+    if (finale==1) {
+        risultato(utente, punteggioBanco, punteggioGiocatore, puntata);
+    }
+
+    printf("\n       Giocatore:  (%d)\n", punteggioGiocatore);
+    stampaCarteAffiancate(manoGiocatore, numCarteGiocatore);
+}
+
+void printCarteBancoGiocatoreCoperta(Utente* utente, Carta manoBanco[], Carta manoGiocatore[], int numCarteBanco, int numCarteGiocatore) {
 
     system("cls");
 
     printUsernameSaldo(*utente);
 
     printf("       Banco:\n");
-    stampaCarteAffiancate(manoBanco, offsetBanco);
+    stampaCarteAffiancateConCoperta(manoBanco, numCarteBanco);
 
-    if (finale==1) {
-        risultato(utente, punteggioBanco, punteggioGiocatore, puntata);
-    }
-
-    printf("\n       Giocatore:\n");
-    stampaCarteAffiancate(manoGiocatore, offsetGiocatore);
+    printf("\n       Giocatore:  (%d)\n", calcolaPunteggio(manoGiocatore, numCarteGiocatore));
+    stampaCarteAffiancate(manoGiocatore, numCarteGiocatore);
 }
 
 int getPuntata(Utente* utente) {
@@ -223,7 +245,6 @@ int getPuntata(Utente* utente) {
                 Sleep(1500);
                 system("cls");
                 exit = 0;
-                break;
             }
         }
         else {
@@ -242,11 +263,16 @@ int getPuntata(Utente* utente) {
 	return puntata;
 }
 
-void printMenuGiocatore() {
+void printMenuGiocatore(int numCarteGiocatore) {
     printf("\n\n");
     printCentered("Inserisci:");
     printf("\n");
-    printCentered("1. Carta      2. Stai      3. Raddoppio      4. Split");
+
+    if (numCarteGiocatore > 2) {
+        printCentered("1. Carta      2. Stai");
+    } else {
+        printCentered("1. Carta      2. Stai      3. Raddoppio      4. Split");
+	}
 }
 
 int continuaPartita(Utente* utente) {

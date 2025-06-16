@@ -3,6 +3,8 @@
 #include <time.h>
 #include "utils.h"
 #include <stdio.h>
+#include <windows.h> // Per SetConsoleTextAttribute
+
 #define NUM_CARTE 104 // 2 mazzi da 52 carte
 #define MAX_MANO 11
 
@@ -21,7 +23,6 @@ void  creaMazzo(Carta** top) {
         }
     }
 }
-
 
 // Mescolatura del mazzo
 void mescolaMazzo(Carta** top) {

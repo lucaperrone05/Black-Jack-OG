@@ -43,7 +43,6 @@ void stampaCarteAffiancate(Carta carte[], int n) {
     }
 }
 
-
 void stampaCarteAffiancateConCoperta(Carta carte[], int n) {
     system("chcp 65001 >nul"); // UTF-8 per la console
 
@@ -54,33 +53,32 @@ void stampaCarteAffiancateConCoperta(Carta carte[], int n) {
 
             if (coperta) {
                 switch (riga) {
-                case 0: printf(" _________ "); break;
-                case 1: printf("|         |"); break;
-                case 2: printf("|         |"); break;
-                case 3: printf("|         |"); break;
-                case 4: printf("|   ? ?   |"); break;
-                case 5: printf("|         |"); break;
-                case 6: printf("|         |"); break;
-                case 7: printf("|_________|"); break;
+                    case 0: printf(" _________ "); break;
+                    case 1: printf("|         |"); break;
+                    case 2: printf("|         |"); break;
+                    case 3: printf("|         |"); break;
+                    case 4: printf("|   ? ?   |"); break;
+                    case 5: printf("|         |"); break;
+                    case 6: printf("|         |"); break;
+                    case 7: printf("|_________|"); break;
                 }
             }
             else {
                 switch (riga) {
-                case 0: printf(" _________ "); break;
-                case 1: printf("|         |"); break;
-                case 2: printf("| %-2s      |", c.valore); break;
-                case 3: printf("|         |"); break;
-                case 4: printf("|    %s    |", c.seme); break;
-                case 5: printf("|         |"); break;
-                case 6: printf("|      %-2s |", c.valore); break;
-                case 7: printf("|_________|"); break;
+                    case 0: printf(" _________ "); break;
+                    case 1: printf("|         |"); break;
+                    case 2: printf("| %-2s      |", c.valore); break;
+                    case 3: printf("|         |"); break;
+                    case 4: printf("|    %s    |", c.seme); break;
+                    case 5: printf("|         |"); break;
+                    case 6: printf("|      %-2s |", c.valore); break;
+                    case 7: printf("|_________|"); break;
                 }
             }
         }
         printf("\n");
     }
 }
-
 
 void partita(Utente* utente, int nuova) {
     Carta* mazzo = NULL;
@@ -100,7 +98,7 @@ void partita(Utente* utente, int nuova) {
 
 
     do {
-        int scelta;
+        int scelta, exit=0;
         int numCarteGiocatore = 2;
         int numCarteBanco = 2;
         int punteggioGiocatore = 0;
@@ -110,26 +108,60 @@ void partita(Utente* utente, int nuova) {
 
         manoIniziale(*utente, &mazzo, &cartaEstratta, manoBanco, manoGiocatore);
 
-        do {
-            printMenuGiocatore();
+        punteggioGiocatore = calcolaPunteggio(manoGiocatore, 2);
+
+        while (exit == 0 && punteggioGiocatore < 21) {
+            printMenuGiocatore(numCarteGiocatore);
             getScelta(&scelta);
 
-            if (scelta == 1) {
+            switch (scelta) {
+            case 1:
                 cartaEstratta = pop(&mazzo);
                 manoGiocatore[numCarteGiocatore++] = *cartaEstratta;
+                printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore);
+                break;
 
-                printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore, 0);
+            case 2:
+                exit = 1; // Il giocatore decide di fermarsi
+                break;
+
+            case 3:
+                if (numCarteGiocatore == 2) {
+					utente->saldo -= puntata; // Sottrae la puntata raddoppiata dal saldo dell'utente
+                    puntata *= 2; // Raddoppia la puntata
+                    cartaEstratta = pop(&mazzo);
+                    manoGiocatore[numCarteGiocatore++] = *cartaEstratta;
+                    printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore);
+                    exit = 1; // Il giocatore decide di fermarsi dopo il raddoppio
+                }
+                else {
+                    printOpzioneNonValida();
+                    printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore);
+                }
+                break;
+
+            case 4:
+                if (numCarteGiocatore == 2) {
+                    //da fare prima o poi
+                }
+                else {
+                    printOpzioneNonValida();
+                    printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore);
+                }
+                break;
+
+            default:
+                printOpzioneNonValida();
+                printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore);
             }
-
             punteggioGiocatore = calcolaPunteggio(manoGiocatore, numCarteGiocatore);
-        } while (scelta == 1 && punteggioGiocatore <= 21);
+        };
 
 
         if (punteggioGiocatore <= 21) {
 
-            printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore, 0);
-
             punteggioBanco = calcolaPunteggio(manoBanco, numCarteBanco);
+            printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore, 0);
 
             Sleep(1000);
 
@@ -137,10 +169,10 @@ void partita(Utente* utente, int nuova) {
                 cartaEstratta = pop(&mazzo);
                 manoBanco[numCarteBanco++] = *cartaEstratta;
 
+                punteggioBanco = calcolaPunteggio(manoBanco, numCarteBanco);
                 printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore, 0);
 
-                punteggioBanco = calcolaPunteggio(manoBanco, numCarteBanco);
-                Sleep(1000);
+                Sleep(1300);
             }
         }
 

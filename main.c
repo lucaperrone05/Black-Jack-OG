@@ -11,6 +11,8 @@
 
 int main() {
 
+    system("color 20");
+
     int exit = 0, menu = 0;
 
 	Utente utente = { 0 }; // Inizializza la struttura utente
@@ -36,8 +38,8 @@ int main() {
 
         default:
             printOpzioneNonValida();
-			break;
         }
+
     } while (exit==0 && utente.loggato==0);
 
 
@@ -55,11 +57,8 @@ int main() {
             switch (menu) {
                 case 1:
                 case 2:
-
 					system("cls"); // Pulisce lo schermo
-				    
 					partita(&utente, menu); // Inizializza una nuova partita
-
                     break;
 
                 case 3:
@@ -71,10 +70,9 @@ int main() {
                     break;
                 default:
                     printOpzioneNonValida();
-					break;
             }
+
         }while(exit == 0);
-        
     }
 
     return 0;

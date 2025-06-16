@@ -1,2 +1,3 @@
-﻿  main.c
+﻿  game.c
+C:\Users\perro\Desktop\Black-Jack-OG\game.c(181,14): warning C4013: 'continuaPartita' non definita. Verrà considerata come esterna che restituisce un int.
   Black_Jack_OG.vcxproj -> C:\Users\perro\Desktop\Black-Jack-OG\x64\Debug\Black_Jack_OG.exe
