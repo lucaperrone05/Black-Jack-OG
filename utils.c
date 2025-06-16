@@ -83,7 +83,7 @@ void printMenuLogin() {
     printCentered("3. Exit\n");
 }
 
-void printMenuGioco(char* username, int saldo) {
+void printMenuScelta(char* username, int saldo) {
     
     system("cls");
     printCentered("Benvenuto nel gioco di BlackJack!\n\n");
@@ -105,12 +105,19 @@ void printChiusuraProgramma() {
     printf("\n\n\n");
 }
 
+void printOpzioneNonValida() {
+    printf("\nOpzione non valida!\n");
+    Sleep(1500);
+    system("cls"); // Pulisce lo schermo
+}
+
 void printUsernameSaldo(Utente utente) {
     printCentered("BlackJack");
     printf("%s\nSaldo:%d\n\n", utente.username, utente.saldo);
 }
 
 void printMescolamento() {
+	printf("\n\n");
     printCentered("Procedo al mescolamento delle carte . . .");
     Sleep(2000); // Attendi 2 secondi per dare tempo di leggere il messaggio
     system("cls"); // Pulisci la console
@@ -128,7 +135,7 @@ void manoIniziale(Utente utente ,Carta** mazzo, Carta** cartaEstratta, Carta man
     }
     stampaCarteAffiancateConCoperta(manoBanco, 2);
 
-    printf("\n\n\n       Giocatore:\n");
+    printf("\n       Giocatore:\n");
 
     for (int i = 0; i < 2; i++) {
         *cartaEstratta = pop(mazzo);
@@ -137,14 +144,45 @@ void manoIniziale(Utente utente ,Carta** mazzo, Carta** cartaEstratta, Carta man
     stampaCarteAffiancate(manoGiocatore, 2);
 }
 
-void printCarteBancoGiocatore(Carta manoBanco[], Carta manoGiocatore[], int offsetBanco, int offsetGiocatore) {
+void risultato(Utente* utente, int punteggioBanco, int punteggioGiocatore, int puntata) {
+    if (punteggioBanco > punteggioGiocatore && punteggioBanco <= 21) {
+        printCentered("Ha vinto il banco!");
+    }
+    else if (punteggioGiocatore > punteggioBanco && punteggioGiocatore <= 21) {
+        printCentered("Hai vinto tu!");
+        utente->saldo += puntata * 2; // Il giocatore vince la puntata
+    }
+    else if (punteggioGiocatore > 21 && punteggioBanco <= 21) {
+        printCentered("Hai sballato. Vince il banco!");
+    }
+    else if (punteggioBanco > 21 && punteggioGiocatore <= 21) {
+        printCentered("Il banco ha sballato. Hai vinto tu!");
+        utente->saldo += puntata * 2;
+    }
+    else {
+        printCentered("Avete pareggiato!");
+        utente->saldo += puntata; // Recupera la puntata
+    }
+}
+
+void printCarteBancoGiocatore(Utente* utente, int punteggioBanco, int punteggioGiocatore, int puntata, Carta manoBanco[], Carta manoGiocatore[], int offsetBanco, int offsetGiocatore, int finale) {   
+
+    system("cls");
+
+    printUsernameSaldo(*utente);
+
     printf("       Banco:\n");
     stampaCarteAffiancate(manoBanco, offsetBanco);
-    printf("\n\n\n       Giocatore:\n");
+
+    if (finale==1) {
+        risultato(utente, punteggioBanco, punteggioGiocatore, puntata);
+    }
+
+    printf("\n       Giocatore:\n");
     stampaCarteAffiancate(manoGiocatore, offsetGiocatore);
 }
 
-int getPuntata(Utente** utente) {
+int getPuntata(Utente* utente) {
     
     int puntata;
     int exit;
@@ -153,7 +191,7 @@ int getPuntata(Utente** utente) {
         puntata = 0;
         exit = 1;
 
-        printUsernameSaldo(**utente);
+        printUsernameSaldo(*utente);
 
         printf("\n\n");
         printCentered("Inserire puntata: ");
@@ -170,7 +208,7 @@ int getPuntata(Utente** utente) {
 
         getScelta(&puntata);
 
-        if (puntata <= (*utente)->saldo) {
+        if (puntata <= utente->saldo) {
 
 			switch (puntata) {  // Controlla se la puntata è valida
             case 10:
@@ -197,9 +235,47 @@ int getPuntata(Utente** utente) {
 
     } while (exit==0);
 
-    (*utente)->saldo -= puntata; // Sottrae la puntata dal saldo dell'utente
+    utente->saldo -= puntata; // Sottrae la puntata dal saldo dell'utente
 
     system("cls");
 
 	return puntata;
+}
+
+void printMenuGiocatore() {
+    printf("\n\n");
+    printCentered("Inserisci:");
+    printf("\n");
+    printCentered("1. Carta      2. Stai      3. Raddoppio      4. Split");
+}
+
+int continuaPartita(Utente* utente) {
+    char risposta;
+	int scelta = -1;
+
+    do {
+		Sleep(2000);
+		system("cls");
+		printUsernameSaldo(*utente);
+        printf("\n\n\n");
+        printCentered("Vuoi continuare la partita?");
+        printf("\n(S/N): ");
+        scanf("%c", &risposta);  // Spazio prima di %c per ignorare newline precedenti
+		while (getchar() != '\n'); // Svuota il buffer di input
+
+        if (risposta == 's' || risposta == 'S') {
+            scelta = 1;
+        }
+        else if (risposta == 'n' || risposta == 'N') {
+            scelta = 0;
+        }
+        else {
+			system("cls");
+            printf("\n\n\n");
+            printCentered("Input non valido. Inserisci 'S' per si o 'N' per no.\n");
+        }
+	} while (scelta == -1);
+    
+	system("cls");
+    return scelta;
 }

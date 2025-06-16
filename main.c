@@ -11,13 +11,11 @@
 
 int main() {
 
-    int exit, menu = 0;
+    int exit = 0, menu = 0;
 
 	Utente utente = { 0 }; // Inizializza la struttura utente
 
     do {
-        exit = 0;
-
 		printMenuLogin();  // Stampa il menu di login
 
 		getScelta(&menu); // Ottiene la scelta dell'utente
@@ -37,9 +35,7 @@ int main() {
             break;
 
         default:
-            printf("\nOpzione non valida!\n");
-            Sleep(1500);
-            system("cls"); // Pulisce lo schermo
+            printOpzioneNonValida();
 			break;
         }
     } while (exit==0 && utente.loggato==0);
@@ -52,7 +48,7 @@ int main() {
 
         do {
 			
-            printMenuGioco(utente.username, utente.saldo);
+            printMenuScelta(utente.username, utente.saldo);
             getScelta(&menu);
 
 
@@ -64,8 +60,6 @@ int main() {
 				    
 					partita(&utente, menu); // Inizializza una nuova partita
 
-					system("pause"); // Pausa per visualizzare la carta
-
                     break;
 
                 case 3:
@@ -75,10 +69,8 @@ int main() {
                     printChiusuraProgramma(); // Stampa il messaggio di chiusura
                     exit = 1;
                     break;
-                defualt:
-                    printf("\nOpzione non valida!\n");
-                    Sleep(1500);
-					system("cls"); // Pulisce lo schermo
+                default:
+                    printOpzioneNonValida();
 					break;
             }
         }while(exit == 0);

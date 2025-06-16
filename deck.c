@@ -1,6 +1,8 @@
 #include "deck.h"
 #include <stdlib.h>
 #include <time.h>
+#include "utils.h"
+#include <stdio.h>
 #define NUM_CARTE 104 // 2 mazzi da 52 carte
 #define MAX_MANO 11
 

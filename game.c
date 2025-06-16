@@ -85,78 +85,66 @@ void stampaCarteAffiancateConCoperta(Carta carte[], int n) {
 void partita(Utente* utente, int nuova) {
     Carta* mazzo = NULL;
     Carta* cartaEstratta;
-    Carta manoBanco[MAX_MANO] = { 0 }; // Mano del banco
-    Carta manoGiocatore[MAX_MANO] = { 0 }; // Mano del giocatore
-    int scelta, offset = 2;
-
-    if (nuova==1) {
-        creaMazzo(&mazzo); // Crea il mazzo di carte
-        mescolaMazzo(&mazzo); // Mescola il mazzo di carte
+    Carta manoBanco[MAX_MANO] = { 0 };
+    Carta manoGiocatore[MAX_MANO] = { 0 };
+    
+    if (nuova == 1) {
+        creaMazzo(&mazzo);
+        printUsernameSaldo(*utente);
+        printMescolamento();
+        mescolaMazzo(&mazzo);
     }
     else {
-        //mazzo = carichiamo il mazzo salvato nel DB
+        // mazzo = carichiamo il mazzo salvato nel DB
     }
-    
 
-    printUsernameSaldo(*utente);
-
-    printMescolamento();
-
-	getPuntata(&utente);
-
-    manoIniziale(*utente, &mazzo, &cartaEstratta, manoBanco, manoGiocatore);
 
     do {
-        printf("\n\n");
-        printCentered("Inserisci:");
+        int scelta;
+        int numCarteGiocatore = 2;
+        int numCarteBanco = 2;
+        int punteggioGiocatore = 0;
+        int punteggioBanco = 0;
 
-        printf("\n");
-        printCentered("1. Carta      2. Stai      3. Raddioppio      4. Split");
-        getScelta(&scelta);
+        int puntata = getPuntata(utente);
 
-        if (scelta == 1) {
-            cartaEstratta = pop(&mazzo);
-            manoGiocatore[offset] = *cartaEstratta; // Aggiungi una carta alla mano del giocatore
-            offset++;
-            system("cls"); // Pulisci la console
-            
-            printUsernameSaldo(*utente);
+        manoIniziale(*utente, &mazzo, &cartaEstratta, manoBanco, manoGiocatore);
 
-            printCarteBancoGiocatore(manoBanco, manoGiocatore, 2, offset);
-        }
+        do {
+            printMenuGiocatore();
+            getScelta(&scelta);
 
-    } while (scelta == 1 && calcolaPunteggio(manoGiocatore, offset) <= 21);
+            if (scelta == 1) {
+                cartaEstratta = pop(&mazzo);
+                manoGiocatore[numCarteGiocatore++] = *cartaEstratta;
 
-    int numCarteGiocatore = offset;
+                printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore, 0);
+            }
 
-    if (calcolaPunteggio(manoGiocatore, offset) > 21) {
-        printf("\nHai sballato! Hai perso.\n");
-    }
-    else {
-		system("cls"); // Pulisci la console
-		
-        printUsernameSaldo(*utente);
+            punteggioGiocatore = calcolaPunteggio(manoGiocatore, numCarteGiocatore);
+        } while (scelta == 1 && punteggioGiocatore <= 21);
 
-		printCarteBancoGiocatore(manoBanco, manoGiocatore, 2, numCarteGiocatore);
-        offset = 2; // Reset offset per il banco
-		
-        Sleep(1000); 
-        
-        int punteggioBanco = calcolaPunteggio(manoBanco, 2);
-        
-        while (punteggioBanco < 17) { // Il banco deve pescare fino a raggiungere almeno 17
-            cartaEstratta = pop(&mazzo);
-            manoBanco[offset] = *cartaEstratta; // Aggiungi una carta alla mano del banco
-            offset++;
-            system("cls"); // Pulisci la console
-            printCentered("BlackJack\n");
-            printf("%s\nSaldo:%d\n\n\n", utente->username, utente->saldo);
-            printf("       Banco:\n");
-            stampaCarteAffiancate(manoBanco, offset);
-            printf("\n\n\n       Giocatore:\n");
-            stampaCarteAffiancate(manoGiocatore, numCarteGiocatore);
-            punteggioBanco = calcolaPunteggio(manoBanco, offset);
+
+        if (punteggioGiocatore <= 21) {
+
+            printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore, 0);
+
+            punteggioBanco = calcolaPunteggio(manoBanco, numCarteBanco);
+
             Sleep(1000);
+
+            while (punteggioBanco < 17) {
+                cartaEstratta = pop(&mazzo);
+                manoBanco[numCarteBanco++] = *cartaEstratta;
+
+                printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore, 0);
+
+                punteggioBanco = calcolaPunteggio(manoBanco, numCarteBanco);
+                Sleep(1000);
+            }
         }
-    }
+
+        printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore, 1);
+
+    } while (continuaPartita(utente) == 1);
 }
