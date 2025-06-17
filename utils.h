@@ -17,3 +17,6 @@ int getPuntata(Utente* utente);
 void risultato(Utente* utente, int punteggioBanco, int punteggioGiocatore, int puntata, int numCarteGiocatore);
 void printMenuGiocatore(int numCarteGiocatore);
 int contaCarteNelMazzo(Carta* mazzo);
+char* serializzaMazzo(Carta* mazzo);
+Carta* deserializzaMazzo(const char* str);
+void liberaMazzo(Carta* mazzo);

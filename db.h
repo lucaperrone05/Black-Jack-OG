@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "sqlite3.h"
+#include "deck.h"
 
 
 void apriDatabase(sqlite3** db);
@@ -9,3 +10,5 @@ int loginDb(sqlite3* db, const char* username, const char* password);
 int caricaUtente(sqlite3* db, const char* username, Utente* utente);
 int utenteEsiste(sqlite3* db, const char* username);
 void aggiornaSaldo(sqlite3* db, const char* username, int nuovoSaldo);
+int salvaMazzoUtente(sqlite3* db, Carta* mazzo, const char* username);
+Carta* caricaMazzoUtente(sqlite3* db, const char* username);

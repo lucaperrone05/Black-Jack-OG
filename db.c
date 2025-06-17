@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "sqlite3.h"
 #include "user.h"
+#include "deck.h"
 
 //funzione che apre il database
 void apriDatabase(sqlite3** db) {
@@ -13,14 +14,18 @@ void apriDatabase(sqlite3** db) {
 }
 
 //funzione per creare la tabella utenti se non esiste
-void creaTabellaUser(sqlite3* db) {
+void creaTabellaUser(sqlite3* db)
+
+{
 	char* sqlCreate = "CREATE TABLE IF NOT EXISTS utenti ("
 		"id INTEGER PRIMARY KEY AUTOINCREMENT, "
 		"nome TEXT NOT NULL, "
 		"cognome TEXT NOT NULL, "
 		"username TEXT UNIQUE NOT NULL, "
 		"saldo INTEGER NOT NULL, "
-		"password TEXT NOT NULL);";
+		"password TEXT NOT NULL"
+		"mazzo TEXT);";
+
 	char* errMsg = 0;
 	int rc = sqlite3_exec(db, sqlCreate, 0, 0, &errMsg); // Esegue la query di creazione della tabella
 
@@ -97,7 +102,7 @@ int loginDb(sqlite3* db, const char* username, const char* password) {
 
 int caricaUtente(sqlite3* db, const char* username, Utente* utente) {
 	sqlite3_stmt* stmt;
-	const char* sql = "SELECT id, nome, cognome, username, saldo FROM utenti WHERE username = ?;";
+	const char* sql = "SELECT id, nome, cognome, username, saldo, mazzo FROM utenti WHERE username = ?;";
 
 	int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
 	if (rc != SQLITE_OK) {
@@ -114,6 +119,7 @@ int caricaUtente(sqlite3* db, const char* username, Utente* utente) {
 		strcpy(utente->cognome, (const char*)sqlite3_column_text(stmt, 2)); // cognome
 		strcpy(utente->username, (const char*)sqlite3_column_text(stmt, 3)); // username
 		utente->saldo = sqlite3_column_int(stmt, 4); // saldo
+		sqlite3_column_text(stmt, 5);
 		sqlite3_finalize(stmt);
 		return 1;
 	}
@@ -158,4 +164,65 @@ void aggiornaSaldo(sqlite3* db, const char* username, int nuovoSaldo) {
 		printf("Errore aggiornamento saldo: %s\n", sqlite3_errmsg(db));
 	}
 	sqlite3_finalize(stmt);
+}
+
+int salvaMazzoUtente(sqlite3* db, Carta* mazzo, const char* username) {
+	char* stringaMazzo = serializzaMazzo(mazzo);
+	if (!stringaMazzo) {
+		fprintf(stderr, "Errore serializzazione mazzo\n");
+		return 0;
+	}
+
+	const char* sql = "UPDATE utenti SET mazzo = ? WHERE username = ?";
+	sqlite3_stmt* stmt;
+	int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "Errore prepare: %s\n", sqlite3_errmsg(db));
+		free(stringaMazzo);
+		return 0;
+	}
+
+	sqlite3_bind_text(stmt, 1, stringaMazzo, -1, SQLITE_TRANSIENT); // mazzo serializzato
+	sqlite3_bind_text(stmt, 2, username, -1, SQLITE_TRANSIENT);     // username
+
+	rc = sqlite3_step(stmt);
+	if (rc != SQLITE_DONE) {
+		fprintf(stderr, "Errore update: %s\n", sqlite3_errmsg(db));
+		sqlite3_finalize(stmt);
+		free(stringaMazzo);
+		return 0;
+	}
+
+	sqlite3_finalize(stmt);
+	free(stringaMazzo);
+	return 1; // OK
+}
+
+// Carica il mazzo dal DB per uno username specifico e lo deserializza
+Carta* caricaMazzoUtente(sqlite3* db, const char* username) {
+	const char* sql = "SELECT mazzo FROM utenti WHERE username = ?";
+	sqlite3_stmt* stmt;
+	Carta* mazzo = NULL;
+
+	int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "Errore prepare: %s\n", sqlite3_errmsg(db));
+		return NULL;
+	}
+
+	sqlite3_bind_text(stmt, 1, username, -1, SQLITE_TRANSIENT);
+
+	rc = sqlite3_step(stmt);
+	if (rc == SQLITE_ROW) {
+		const unsigned char* stringaMazzo = sqlite3_column_text(stmt, 0);
+		if (stringaMazzo) {
+			mazzo = deserializzaMazzo((const char*)stringaMazzo);
+		}
+	}
+	else {
+		fprintf(stderr, "Nessun utente trovato con username '%s'\n", username);
+	}
+
+	sqlite3_finalize(stmt);
+	return mazzo;
 }

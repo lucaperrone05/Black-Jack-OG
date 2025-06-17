@@ -5,6 +5,7 @@
 #include "deck.h"
 #include "utils.h"
 #include "user.h"
+#include "db.h"
 #define NUM_CARTE 52
 #define MAX_MANO 10
 
@@ -85,6 +86,7 @@ void partita(Utente* utente, int nuova) {
     Carta* cartaEstratta;
     Carta manoBanco[MAX_MANO] = { 0 };
     Carta manoGiocatore[MAX_MANO] = { 0 };
+    sqlite3* db;
     
     if (nuova == 1) {
         creaMazzo(&mazzo);
@@ -93,9 +95,10 @@ void partita(Utente* utente, int nuova) {
         mescolaMazzo(&mazzo);
     }
     else {
-        // mazzo = carichiamo il mazzo salvato nel DB
+        apriDatabase(&db);
+        mazzo = caricaMazzoUtente(db, utente->username);
+        sqlite3_close(db);
     }
-
 
     do {
         if (contaCarte(mazzo) < 20) {
@@ -184,6 +187,10 @@ void partita(Utente* utente, int nuova) {
         }
 
         printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore, 1);
+
+		apriDatabase(&db);
+        salvaMazzoUtente(db, mazzo, utente->username);
+		sqlite3_close(db);
 
     } while (continuaPartita(utente) == 1);
 }

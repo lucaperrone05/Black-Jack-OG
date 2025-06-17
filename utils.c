@@ -8,6 +8,10 @@
 #include "deck.h"
 #include "game.h"
 #include "sqlite3.h"
+#ifdef _MSC_VER
+#define strtok_r strtok_s
+#define strdup _strdup
+#endif
 
 void getPassword(char* password, int maxLength) {
     HANDLE hConsole = GetStdHandle(STD_INPUT_HANDLE);
