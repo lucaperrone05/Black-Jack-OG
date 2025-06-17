@@ -7,7 +7,7 @@
 #include "db.h"
 #include "deck.h"
 #include "game.h"
-
+#include "sqlite3.h"
 
 void getPassword(char* password, int maxLength) {
     HANDLE hConsole = GetStdHandle(STD_INPUT_HANDLE);
@@ -66,7 +66,7 @@ void getScelta(int* menu) {
     printf("\nScelta: ");
 
     if (scanf("%d", menu) != 1) {
-        menu = -1; // forza default
+        *menu = -1; // forza default
     }
 
     // svuota completamente il buffer
@@ -145,33 +145,51 @@ void manoIniziale(Utente utente ,Carta** mazzo, Carta** cartaEstratta, Carta man
     stampaCarteAffiancate(manoGiocatore, 2);
 }
 
-void risultato(Utente* utente, int punteggioBanco, int punteggioGiocatore, int puntata) {
+void risultato(Utente* utente, int punteggioBanco, int punteggioGiocatore, int puntata, int numCarteGiocatore) {
+	
+	sqlite3* db;
+    apriDatabase(&db);
+
+    int nuovoSaldo = 0;
+    
     printf("\n");
     if (punteggioBanco > punteggioGiocatore && punteggioBanco <= 21) {
         printCentered("Ha vinto il banco!");
     }
     else if (punteggioGiocatore > punteggioBanco && punteggioGiocatore <= 21) {
         
-        if(punteggioGiocatore==21){
+        if(punteggioGiocatore==21 && numCarteGiocatore==2){
             printCentered("BlackJack. Hai vinto!");
-            utente->saldo += puntata * 2.5; // Il giocatore vince la puntata
+			utente->saldo += puntata * 2.5; // Il giocatore vince il 150% della puntata
+			nuovoSaldo = utente->saldo; // Aggiorna il saldo
+            aggiornaSaldo(db, utente->username, nuovoSaldo);
+
         }
         else {
             printCentered("Hai vinto!");
-            utente->saldo += puntata * 2; // Il giocatore vince la puntata
+            utente->saldo += puntata * 2; // Il giocatore vince il 150% della puntata
+            nuovoSaldo = utente->saldo; // Aggiorna il saldo
+            aggiornaSaldo(db, utente->username, nuovoSaldo);
         }
     }
     else if (punteggioGiocatore > 21 && punteggioBanco <= 21) {
         printCentered("Hai sballato. Vince il banco!");
+        nuovoSaldo = utente->saldo; // Aggiorna il saldo
+        aggiornaSaldo(db, utente->username, nuovoSaldo);
     }
     else if (punteggioBanco > 21 && punteggioGiocatore <= 21) {
         printCentered("Il banco ha sballato. Hai vinto!");
-        utente->saldo += puntata * 2;
+        utente->saldo += puntata * 2; // Il giocatore vince il 150% della puntata
+        nuovoSaldo = utente->saldo; // Aggiorna il saldo
+        aggiornaSaldo(db, utente->username, nuovoSaldo);
     }
     else {
         printCentered("Avete pareggiato!");
         utente->saldo += puntata; // Recupera la puntata
     }
+
+    sqlite3_close(db);
+
 }
 
 void printCarteBancoGiocatore(Utente* utente, int punteggioBanco, int punteggioGiocatore, int puntata, Carta manoBanco[], Carta manoGiocatore[], int numCarteBanco, int numCarteGiocatore, int finale) {
@@ -184,7 +202,7 @@ void printCarteBancoGiocatore(Utente* utente, int punteggioBanco, int punteggioG
     stampaCarteAffiancate(manoBanco, numCarteBanco);
 
     if (finale==1) {
-        risultato(utente, punteggioBanco, punteggioGiocatore, puntata);
+        risultato(utente, punteggioBanco, punteggioGiocatore, puntata, numCarteGiocatore);
     }
 
     printf("\n       Giocatore:  (%d)\n", punteggioGiocatore);
@@ -304,4 +322,91 @@ int continuaPartita(Utente* utente) {
     
 	system("cls");
     return scelta;
+}
+
+int contaCarteNelMazzo(Carta* mazzo) {
+    int count = 0;
+    while (mazzo != NULL) {
+        count++;
+        mazzo = mazzo->next;
+    }
+    return count;
+}
+
+char* serializzaMazzo(Carta* mazzo) {
+    if (!mazzo) return NULL;
+
+    size_t bufsize = 256;
+    char* buffer = malloc(bufsize);
+    if (!buffer) return NULL;
+    buffer[0] = '\0';
+
+    Carta* cur = mazzo;
+    while (cur) {
+        size_t needed = strlen(buffer) + strlen(cur->valore) + strlen(cur->seme) + 20;
+        if (needed > bufsize) {
+            bufsize *= 2;
+            buffer = realloc(buffer, bufsize);
+            if (!buffer) return NULL;
+        }
+        // Serializzo: valore,simb_seme,punti|
+        char tmp[64];
+        snprintf(tmp, sizeof(tmp), "%s,%s,%d|", cur->valore, cur->seme, cur->punti);
+        strcat(buffer, tmp);
+
+        cur = cur->next;
+    }
+    // Rimuovi l'ultimo '|' se presente
+    size_t len = strlen(buffer);
+    if (len > 0 && buffer[len - 1] == '|')
+        buffer[len - 1] = '\0';
+
+    return buffer;
+}
+
+// Deserializza una stringa in una pila di Carte
+Carta* deserializzaMazzo(const char* str) {
+    if (!str || *str == '\0') return NULL;
+
+    Carta* head = NULL;
+    Carta* tail = NULL;
+
+    char* data = strdup(str);
+    char* saveptr1 = NULL;
+    char* token = strtok_r(data, "|", &saveptr1);
+    while (token) {
+        // Ogni token è: valore,simbolo,punti
+        char* valore = strtok(token, ",");
+        char* seme = strtok(NULL, ",");
+        char* punti_str = strtok(NULL, ",");
+
+        if (!valore || !seme || !punti_str) {
+            token = strtok_r(NULL, "|", &saveptr1);
+            continue;
+        }
+
+        Carta* c = malloc(sizeof(Carta));
+        c->valore = strdup(valore);
+        c->seme = strdup(seme); // simbolo del seme
+        c->punti = atoi(punti_str);
+        c->next = NULL;
+
+        if (!head) { head = c; tail = c; }
+        else { tail->next = c; tail = c; }
+
+        token = strtok_r(NULL, "|", &saveptr1);
+    }
+    free(data);
+    return head;
+}
+
+// Funzione di utilità per liberare la memoria della pila
+void liberaMazzo(Carta* mazzo) {
+    while (mazzo) {
+        Carta* tmp = mazzo;
+        mazzo = mazzo->next;
+        free(tmp->valore);
+        free(tmp->seme);
+        free(tmp);
+    }
 }

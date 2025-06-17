@@ -8,3 +8,4 @@ void registraUtente(sqlite3* db, char* nome, char* cognome, char* username, char
 int loginDb(sqlite3* db, const char* username, const char* password);
 int caricaUtente(sqlite3* db, const char* username, Utente* utente);
 int utenteEsiste(sqlite3* db, const char* username);
+void aggiornaSaldo(sqlite3* db, const char* username, int nuovoSaldo);

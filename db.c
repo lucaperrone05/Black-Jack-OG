@@ -12,7 +12,6 @@ void apriDatabase(sqlite3** db) {
 	}
 }
 
-
 //funzione per creare la tabella utenti se non esiste
 void creaTabellaUser(sqlite3* db) {
 	char* sqlCreate = "CREATE TABLE IF NOT EXISTS utenti ("
@@ -20,7 +19,7 @@ void creaTabellaUser(sqlite3* db) {
 		"nome TEXT NOT NULL, "
 		"cognome TEXT NOT NULL, "
 		"username TEXT UNIQUE NOT NULL, "
-		"saldo TEXT NOT NULL, "
+		"saldo INTEGER NOT NULL, "
 		"password TEXT NOT NULL);";
 	char* errMsg = 0;
 	int rc = sqlite3_exec(db, sqlCreate, 0, 0, &errMsg); // Esegue la query di creazione della tabella
@@ -30,7 +29,6 @@ void creaTabellaUser(sqlite3* db) {
 		sqlite3_free(errMsg);
 		sqlite3_close(db);
 	}
-
 
 }
 
@@ -61,8 +59,6 @@ void registraUtente(sqlite3* db, char* nome, char* cognome, char* username, char
 
 	sqlite3_finalize(stmt);
 }
-
-
 
 //funzione per cercare l'utente nel database
 int loginDb(sqlite3* db, const char* username, const char* password) {
@@ -98,7 +94,6 @@ int loginDb(sqlite3* db, const char* username, const char* password) {
 	sqlite3_finalize(stmt);
 	return loginValido;
 }
-
 
 int caricaUtente(sqlite3* db, const char* username, Utente* utente) {
 	sqlite3_stmt* stmt;
@@ -145,4 +140,22 @@ int utenteEsiste(sqlite3* db, const char* username) {
 	}
 	sqlite3_finalize(stmt);
 	return exists;   // 1 se già presente, 0 altrimenti
+}
+
+void aggiornaSaldo(sqlite3* db, const char* username, int nuovoSaldo) {
+	sqlite3_stmt* stmt;
+	const char* sql = "UPDATE utenti SET saldo = ? WHERE username = ?;";
+	int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+	if (rc != SQLITE_OK) {
+		printf("Errore preparazione query: %s\n", sqlite3_errmsg(db));
+		return;
+	}
+	sqlite3_bind_int(stmt, 1, nuovoSaldo);
+	sqlite3_bind_text(stmt, 2, username, -1, SQLITE_STATIC);
+	rc = sqlite3_step(stmt);
+
+	if (rc != SQLITE_DONE) {
+		printf("Errore aggiornamento saldo: %s\n", sqlite3_errmsg(db));
+	}
+	sqlite3_finalize(stmt);
 }

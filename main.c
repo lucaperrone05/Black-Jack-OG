@@ -10,9 +10,6 @@
 
 
 int main() {
-
-    system("color 20");
-
     int exit = 0, menu = 0;
 
 	Utente utente = { 0 }; // Inizializza la struttura utente

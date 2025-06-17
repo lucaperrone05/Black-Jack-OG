@@ -98,6 +98,13 @@ void partita(Utente* utente, int nuova) {
 
 
     do {
+        if (contaCarte(mazzo) < 20) {
+            creaMazzo(&mazzo);
+            printUsernameSaldo(*utente);
+            printMescolamento();
+            mescolaMazzo(&mazzo);
+        }
+
         int scelta, exit=0;
         int numCarteGiocatore = 2;
         int numCarteBanco = 2;
@@ -157,10 +164,10 @@ void partita(Utente* utente, int nuova) {
             punteggioGiocatore = calcolaPunteggio(manoGiocatore, numCarteGiocatore);
         };
 
+        punteggioBanco = calcolaPunteggio(manoBanco, numCarteBanco);
 
         if (punteggioGiocatore <= 21) {
 
-            punteggioBanco = calcolaPunteggio(manoBanco, numCarteBanco);
             printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore, 0);
 
             Sleep(1000);
