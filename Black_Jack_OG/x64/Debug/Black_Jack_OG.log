@@ -1,1 +1,5 @@
-﻿  Black_Jack_OG.vcxproj -> C:\Users\perro\Desktop\Black-Jack-OG\x64\Debug\Black_Jack_OG.exe
+﻿  game.c
+C:\Users\onny\Desktop\Black-Jack-OG\game.c(219,14): warning C4013: 'continuaPartita' non definita. Verrà considerata come esterna che restituisce un int.
+C:\Users\onny\Desktop\Black-Jack-OG\game.c(191,13): warning C4101: 'scelta': variabile locale senza riferimenti
+C:\Users\onny\Desktop\Black-Jack-OG\game.c(165,1): warning C4716: 'turnoBanco': deve restituire un valore
+  Black_Jack_OG.vcxproj -> C:\Users\onny\Desktop\Black-Jack-OG\x64\Debug\Black_Jack_OG.exe

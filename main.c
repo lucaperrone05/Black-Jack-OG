@@ -53,9 +53,12 @@ int main() {
 
             switch (menu) {
                 case 1:
+                    system("cls"); // Pulisce lo schermo
+                    partita(&utente, 0); // Inizializza una nuova partita
+                    break;
                 case 2:
 					system("cls"); // Pulisce lo schermo
-					partita(&utente, menu); // Inizializza una nuova partita
+					partita(&utente, 1); // Inizializza una nuova partita
                     break;
 
                 case 3:

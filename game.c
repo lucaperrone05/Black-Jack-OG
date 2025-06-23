@@ -81,112 +81,136 @@ void stampaCarteAffiancateConCoperta(Carta carte[], int n) {
     }
 }
 
-void partita(Utente* utente, int nuova) {
+int turnoGiocatore(Utente* utente, Carta** mazzo, Carta manoGiocatore[], Carta manoBanco[], int* numCarteGiocatore,
+    int numCarteBanco,Carta* cartaEstratta, int *puntata) {
+
+	int exit = 0, scelta;
+    int punteggioGiocatore = calcolaPunteggio(manoGiocatore, 2);
+
+    while (exit == 0 && punteggioGiocatore < 21) {
+        printMenuGiocatore(*numCarteGiocatore);
+        getScelta(&scelta);
+
+        switch (scelta) {
+        case 1:
+            cartaEstratta = pop(mazzo);
+            manoGiocatore[(*numCarteGiocatore)++] = *cartaEstratta;
+            printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, *numCarteGiocatore);
+            break;
+
+        case 2:
+            exit = 1; // Il giocatore decide di fermarsi
+            break;
+
+        case 3:
+            if (*numCarteGiocatore == 2) {
+                utente->saldo -= *puntata; // Sottrae la puntata raddoppiata dal saldo dell'utente
+                *puntata *= 2; // Raddoppia la puntata
+                cartaEstratta = pop(mazzo);
+                manoGiocatore[(*numCarteGiocatore)++] = *cartaEstratta;
+                printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, *numCarteGiocatore);
+                exit = 1; // Il giocatore decide di fermarsi dopo il raddoppio
+            }
+            else {
+                printOpzioneNonValida();
+                printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, *numCarteGiocatore);
+            }
+            break;
+
+        case 4:
+            if (*numCarteGiocatore == 2) {
+                //da fare prima o poi
+            }
+            else {
+                printOpzioneNonValida();
+                printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, *numCarteGiocatore);
+            }
+            break;
+
+        default:
+            printOpzioneNonValida();
+            printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, *numCarteGiocatore);
+        }
+        punteggioGiocatore = calcolaPunteggio(manoGiocatore, *numCarteGiocatore);
+    };
+
+	return punteggioGiocatore;
+}
+
+int turnoBanco(Utente* utente, Carta** mazzo, Carta manoBanco[], Carta manoGiocatore[], int numCarteBanco, int numCarteGiocatore,
+    Carta* cartaEstratta, int punteggioGiocatore, int puntata) {
+
+    int punteggioBanco = calcolaPunteggio(manoBanco, numCarteBanco);
+
+    if (punteggioGiocatore <= 21) {
+
+        printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore, 0);
+
+        Sleep(1000);
+
+        while (punteggioBanco < 17) {
+            cartaEstratta = pop(mazzo);
+            manoBanco[numCarteBanco++] = *cartaEstratta;
+
+            punteggioBanco = calcolaPunteggio(manoBanco, numCarteBanco);
+            printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore,
+                numCarteBanco, numCarteGiocatore, 0);
+
+            Sleep(1300);
+        }
+    }
+
+    printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore,
+        numCarteBanco, numCarteGiocatore, 1);
+}
+
+
+void partita(Utente* utente, int caricaPartita) {
     Carta* mazzo = NULL;
     Carta* cartaEstratta;
     Carta manoBanco[MAX_MANO] = { 0 };
     Carta manoGiocatore[MAX_MANO] = { 0 };
     sqlite3* db;
     
-    if (nuova == 1) {
-        creaMazzo(&mazzo);
-        printUsernameSaldo(*utente);
-        printMescolamento();
-        mescolaMazzo(&mazzo);
-    }
-    else {
+    if (caricaPartita == 1) {
         apriDatabase(&db);
         mazzo = caricaMazzoUtente(db, utente->username);
         sqlite3_close(db);
+
+        if(mazzo == NULL) {
+			printUsernameSaldo(*utente);
+            printCentered("[ERRORE] Impossibile caricare il mazzo salvato. Verrà creato un nuovo mazzo.");
+			Sleep(1500);
+			system("cls");
+		}
     }
+  
 
     do {
-        if (contaCarte(mazzo) < 20) {
+
+        int scelta, exit = 0;
+        int numCarteGiocatore = 2;
+        int numCarteBanco = 2;
+        int punteggioGiocatore = 0;
+        int punteggioBanco = 0;
+		int puntata = 0;
+
+        if (mazzo == NULL || contaCarte(mazzo) < 20) {
             creaMazzo(&mazzo);
             printUsernameSaldo(*utente);
             printMescolamento();
             mescolaMazzo(&mazzo);
         }
 
-        int scelta, exit=0;
-        int numCarteGiocatore = 2;
-        int numCarteBanco = 2;
-        int punteggioGiocatore = 0;
-        int punteggioBanco = 0;
-
-        int puntata = getPuntata(utente);
+        puntata = getPuntata(utente);
 
         manoIniziale(*utente, &mazzo, &cartaEstratta, manoBanco, manoGiocatore);
 
-        punteggioGiocatore = calcolaPunteggio(manoGiocatore, 2);
+        punteggioGiocatore = turnoGiocatore(utente, &mazzo, manoGiocatore, manoBanco, &numCarteGiocatore, numCarteBanco, 
+            cartaEstratta, &puntata);
 
-        while (exit == 0 && punteggioGiocatore < 21) {
-            printMenuGiocatore(numCarteGiocatore);
-            getScelta(&scelta);
-
-            switch (scelta) {
-            case 1:
-                cartaEstratta = pop(&mazzo);
-                manoGiocatore[numCarteGiocatore++] = *cartaEstratta;
-                printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore);
-                break;
-
-            case 2:
-                exit = 1; // Il giocatore decide di fermarsi
-                break;
-
-            case 3:
-                if (numCarteGiocatore == 2) {
-					utente->saldo -= puntata; // Sottrae la puntata raddoppiata dal saldo dell'utente
-                    puntata *= 2; // Raddoppia la puntata
-                    cartaEstratta = pop(&mazzo);
-                    manoGiocatore[numCarteGiocatore++] = *cartaEstratta;
-                    printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore);
-                    exit = 1; // Il giocatore decide di fermarsi dopo il raddoppio
-                }
-                else {
-                    printOpzioneNonValida();
-                    printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore);
-                }
-                break;
-
-            case 4:
-                if (numCarteGiocatore == 2) {
-                    //da fare prima o poi
-                }
-                else {
-                    printOpzioneNonValida();
-                    printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore);
-                }
-                break;
-
-            default:
-                printOpzioneNonValida();
-                printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore);
-            }
-            punteggioGiocatore = calcolaPunteggio(manoGiocatore, numCarteGiocatore);
-        };
-
-        punteggioBanco = calcolaPunteggio(manoBanco, numCarteBanco);
-
-        if (punteggioGiocatore <= 21) {
-
-            printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore, 0);
-
-            Sleep(1000);
-
-            while (punteggioBanco < 17) {
-                cartaEstratta = pop(&mazzo);
-                manoBanco[numCarteBanco++] = *cartaEstratta;
-
-                punteggioBanco = calcolaPunteggio(manoBanco, numCarteBanco);
-                printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore, 0);
-
-                Sleep(1300);
-            }
-        }
-
-        printCarteBancoGiocatore(utente, punteggioBanco, punteggioGiocatore, puntata, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore, 1);
+		turnoBanco(utente, &mazzo, manoBanco, manoGiocatore, numCarteBanco, numCarteGiocatore, cartaEstratta,
+            punteggioGiocatore, puntata);
 
 		apriDatabase(&db);
         salvaMazzoUtente(db, mazzo, utente->username);

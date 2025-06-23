@@ -3,6 +3,7 @@
 #include "sqlite3.h"
 #include "user.h"
 #include "deck.h"
+#include "utils.h"
 
 //funzione che apre il database
 void apriDatabase(sqlite3** db) {
@@ -23,7 +24,7 @@ void creaTabellaUser(sqlite3* db)
 		"cognome TEXT NOT NULL, "
 		"username TEXT UNIQUE NOT NULL, "
 		"saldo INTEGER NOT NULL, "
-		"password TEXT NOT NULL"
+		"password TEXT NOT NULL, "
 		"mazzo TEXT);";
 
 	char* errMsg = 0;
@@ -42,7 +43,7 @@ void creaTabellaUser(sqlite3* db)
 void registraUtente(sqlite3* db, char* nome, char* cognome, char* username, char* password) {
 	sqlite3_stmt* stmt;
 
-	const char* sqlInsert = "INSERT INTO utenti(nome, cognome, username, saldo, password) VALUES (?, ?, ?, ?, ?);";
+	const char* sqlInsert = "INSERT INTO utenti(nome, cognome, username, saldo, password, mazzo) VALUES (?, ?, ?, ?, ?, NULL);";
 	int rc = sqlite3_prepare_v2(db, sqlInsert, -1, &stmt, 0);
 
 	if (rc != SQLITE_OK) {
@@ -102,7 +103,7 @@ int loginDb(sqlite3* db, const char* username, const char* password) {
 
 int caricaUtente(sqlite3* db, const char* username, Utente* utente) {
 	sqlite3_stmt* stmt;
-	const char* sql = "SELECT id, nome, cognome, username, saldo, mazzo FROM utenti WHERE username = ?;";
+	const char* sql = "SELECT id, nome, cognome, username, saldo FROM utenti WHERE username = ?;";
 
 	int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
 	if (rc != SQLITE_OK) {
@@ -119,7 +120,6 @@ int caricaUtente(sqlite3* db, const char* username, Utente* utente) {
 		strcpy(utente->cognome, (const char*)sqlite3_column_text(stmt, 2)); // cognome
 		strcpy(utente->username, (const char*)sqlite3_column_text(stmt, 3)); // username
 		utente->saldo = sqlite3_column_int(stmt, 4); // saldo
-		sqlite3_column_text(stmt, 5);
 		sqlite3_finalize(stmt);
 		return 1;
 	}
