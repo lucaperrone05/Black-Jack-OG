@@ -238,7 +238,7 @@ int getPuntata(Utente* utente) {
         printUsernameSaldo(*utente);
 
         printf("\n\n");
-        printCentered("Inserire puntata: ");
+        printCentered("Inserire puntata");
 
         printf("\n");
         printCentered("Puntate disponibili:");
@@ -293,7 +293,7 @@ void printMenuGiocatore(int numCarteGiocatore) {
     if (numCarteGiocatore > 2) {
         printCentered("1. Carta      2. Stai");
     } else {
-        printCentered("1. Carta      2. Stai      3. Raddoppio      4. Split");
+        printCentered("1. Carta      2. Stai      3. Raddoppio");
 	}
 }
 
@@ -413,4 +413,41 @@ void liberaMazzo(Carta* mazzo) {
         free(tmp->seme);
         free(tmp);
     }
+}
+
+void stampaUltime10Mani(sqlite3* db, Utente utente) {
+    
+    system("cls");
+
+    const char* sql = "SELECT puntata, esito FROM blackjack_hands WHERE user_id = ? ORDER BY id DESC LIMIT 10;";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK) {
+        printf("Errore nella preparazione della query: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    if (sqlite3_bind_int(stmt, 1, utente.id) != SQLITE_OK) {
+        printf("Errore nel bind del parametro user_id: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt);
+        return;
+    }
+
+    printUsernameSaldo(utente); // Stampa l'username e il saldo dell'utente
+
+    printf("Ultime mani di %s\n\n", utente.nome);
+    printf("Puntata\tEsito\n");
+    printf("-------------------\n");
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int puntata = sqlite3_column_int(stmt, 0);
+        const char* esito = (const char*)sqlite3_column_text(stmt, 1);
+        printf("%d\t%s\n", puntata, esito ? esito : "N/A");
+    }
+
+    sqlite3_finalize(stmt);
+    
+	printf("\n\n");
+    system("pause");
+
 }

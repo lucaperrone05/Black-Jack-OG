@@ -117,16 +117,6 @@ int turnoGiocatore(Utente* utente, Carta** mazzo, Carta manoGiocatore[], Carta m
             }
             break;
 
-        case 4:
-            if (*numCarteGiocatore == 2) {
-                //da fare prima o poi
-            }
-            else {
-                printOpzioneNonValida();
-                printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, *numCarteGiocatore);
-            }
-            break;
-
         default:
             printOpzioneNonValida();
             printCarteBancoGiocatoreCoperta(utente, manoBanco, manoGiocatore, numCarteBanco, *numCarteGiocatore);
@@ -179,13 +169,12 @@ void partita(Utente* utente, int caricaPartita) {
 
         if(mazzo == NULL) {
 			printUsernameSaldo(*utente);
-            printCentered("[ERRORE] Impossibile caricare il mazzo salvato. Verrà creato un nuovo mazzo.");
-			Sleep(1500);
+            printCentered("Nessun mazzo da caricare. Verra' creato un nuovo mazzo.");
+			Sleep(2500);
 			system("cls");
 		}
     }
   
-
     do {
 
         int scelta, exit = 0;
@@ -214,7 +203,9 @@ void partita(Utente* utente, int caricaPartita) {
 
 		apriDatabase(&db);
         salvaMazzoUtente(db, mazzo, utente->username);
+        aggiungi_mano(db, utente->id, puntata, (punteggioGiocatore > 21) ? "LOSE" : (punteggioBanco > 21 || punteggioGiocatore > punteggioBanco) ? "WIN" : "PUSH");
 		sqlite3_close(db);
+
 
     } while (continuaPartita(utente) == 1);
 }

@@ -11,6 +11,11 @@
 
 int main() {
     int exit = 0, menu = 0;
+	sqlite3* db = NULL; // Dichiarazione del database
+
+	apriDatabase(&db); // Apre il database
+	creaTabellaMano(db); // Crea la tabella per le mani di blackjack
+	sqlite3_close(db); // Chiude il database dopo la creazione della tabella
 
 	Utente utente = { 0 }; // Inizializza la struttura utente
 
@@ -62,7 +67,9 @@ int main() {
                     break;
 
                 case 3:
-                    // Stampa storico partite
+                    apriDatabase(&db); // Apre il database
+					stampaUltime10Mani(db, utente); // Stampa le ultime 10 mani di blackjack
+                    sqlite3_close(db); // Chiude il database dopo la creazione della tabella
                     break;
                 case 4:
                     printChiusuraProgramma(); // Stampa il messaggio di chiusura

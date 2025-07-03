@@ -1,5 +1,7 @@
 #include "deck.h"
 #include "user.h"
+#include "sqlite3.h"
+
 // Stampa un messaggio centrato
 void printCentered(const char* message); 
 
@@ -56,3 +58,6 @@ Carta* deserializzaMazzo(const char* str);
 
 // Deserializza una stringa in un mazzo di carte
 void liberaMazzo(Carta* mazzo);
+
+// Stampa le ultime 10 mani di blackjack di un utente
+void stampaUltime10Mani(sqlite3* db, Utente utente);

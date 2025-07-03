@@ -12,3 +12,5 @@ int utenteEsiste(sqlite3* db, const char* username);
 void aggiornaSaldo(sqlite3* db, const char* username, int nuovoSaldo);
 int salvaMazzoUtente(sqlite3* db, Carta* mazzo, const char* username);
 Carta* caricaMazzoUtente(sqlite3* db, const char* username);
+void creaTabellaMano(sqlite3* db);
+void aggiungi_mano(sqlite3* db, int user_id, int puntata, const char* esito);

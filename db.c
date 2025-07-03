@@ -15,9 +15,8 @@ void apriDatabase(sqlite3** db) {
 }
 
 //funzione per creare la tabella utenti se non esiste
-void creaTabellaUser(sqlite3* db)
+void creaTabellaUser(sqlite3* db){
 
-{
 	char* sqlCreate = "CREATE TABLE IF NOT EXISTS utenti ("
 		"id INTEGER PRIMARY KEY AUTOINCREMENT, "
 		"nome TEXT NOT NULL, "
@@ -36,6 +35,25 @@ void creaTabellaUser(sqlite3* db)
 		sqlite3_close(db);
 	}
 
+}
+
+void creaTabellaMano(sqlite3* db) {
+	const char* sqlCreate =
+		"CREATE TABLE IF NOT EXISTS blackjack_hands ("
+		"id INTEGER PRIMARY KEY AUTOINCREMENT,"
+		"user_id INTEGER NOT NULL,"
+		"puntata INTEGER NOT NULL,"
+		"esito TEXT NOT NULL"     // valori ammessi: 'WIN', 'LOSE', 'PUSH'
+		");";
+
+	char* errMsg = 0;
+	int rc = sqlite3_exec(db, sqlCreate, 0, 0, &errMsg);
+
+	if (rc != SQLITE_OK) {
+		printf("Errore nella creazione della tabella blackjack_hands: %s\n", errMsg);
+		sqlite3_free(errMsg);
+		// Non chiudere qui il db, lascia gestire a chi chiama eventualmente!
+	}
 }
 
 //funzione per inserire il nuovo utente nel database
@@ -225,4 +243,35 @@ Carta* caricaMazzoUtente(sqlite3* db, const char* username) {
 
 	sqlite3_finalize(stmt);
 	return mazzo;
+}
+
+void aggiungi_mano(sqlite3* db, int user_id, int puntata, const char* esito) {
+	int count;
+	sqlite3_stmt* stmt;
+
+	// Conta le mani dell'utente
+	sqlite3_prepare_v2(db, "SELECT COUNT(*) FROM blackjack_hands WHERE user_id = ?;", -1, &stmt, 0);
+	sqlite3_bind_int(stmt, 1, user_id);
+	if (sqlite3_step(stmt) == SQLITE_ROW) count = sqlite3_column_int(stmt, 0);
+	sqlite3_finalize(stmt);
+
+	// Se ce ne sono già 10, elimina la più vecchia (dello stesso utente)
+	if (count >= 10) {
+		sqlite3_prepare_v2(db,
+			"DELETE FROM blackjack_hands WHERE id = (SELECT id FROM blackjack_hands WHERE user_id = ? ORDER BY id ASC LIMIT 1);",
+			-1, &stmt, 0);
+		sqlite3_bind_int(stmt, 1, user_id);
+		sqlite3_step(stmt);
+		sqlite3_finalize(stmt);
+	}
+
+	// Inserisci la nuova mano
+	sqlite3_prepare_v2(db,
+		"INSERT INTO blackjack_hands (user_id, puntata, esito) VALUES (?, ?, ?);",
+		-1, &stmt, 0);
+	sqlite3_bind_int(stmt, 1, user_id);
+	sqlite3_bind_int(stmt, 2, puntata);
+	sqlite3_bind_text(stmt, 3, esito, -1, SQLITE_STATIC);
+	sqlite3_step(stmt);
+	sqlite3_finalize(stmt);
 }
